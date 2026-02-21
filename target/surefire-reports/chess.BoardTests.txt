@@ -1,0 +1,8 @@
+-------------------------------------------------------------------------------
+Test set: chess.BoardTests
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.011 s <<< FAILURE! - in chess.BoardTests
+testExecutions  Time elapsed: 0.008 s  <<< ERROR!
+java.lang.NullPointerException: Cannot invoke "chess.pieces.Piece.getName()" because "p" is null
+	at chess.BoardTests.testExecutions(BoardTests.java:19)
+
