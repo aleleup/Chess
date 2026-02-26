@@ -36,7 +36,7 @@ public class Board {
         board[currentPos[0]][currentPos[1]] = null;
     };
 
-    public int boardStatusHash() {
+    public int statusKey() {
         int res = 0;
         int i = 0;
         for (Piece piece : piecesArr) {
