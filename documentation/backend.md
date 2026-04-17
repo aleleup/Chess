@@ -24,7 +24,7 @@ The idea is to create a key  of the status of the position of the pieces in the 
 $ A = { n \in \mathbb{N}_0 : n ≤ 9 }$. Then $h: A^m -> \mathbb{N}/ h(x) =  \sum_{i=0}^{|x|-1} (10^ix_i)$
  
 
-In an easy explanation, this function basically takes as an input a vector on n dimensions where each coordenate is a natural number less than 9 (very important) and creates a number of n digits. Ex: $v = (1,2,3,4) -> h(v) = \sum_{i=0}^{|v|-1} (10^iv_i)$ = $\sum_{i=0}^{3} (10^ix_i) = $1*10^0 + 2*10^1 + 3*10^2 + 4*10^3 = 1 + 20 + 300 + 4000 = 4321$.
+In an easy explanation, this function basically takes as an input a vector on n dimensions where each coordenate is a natural number less than 9 (very important) and creates a number of n digits. Ex: $v = (1,2,3,4) -> h(v) = \sum_{i=0}^{|v|-1} (10^iv_i) = \sum_{i=0}^{3} (10^ix_i) = 1*10^0 + 2*10^1 + 3*10^2 + 4*10^3 = 1 + 20 + 300 + 4000 = 4321$ .
 
 Demo of inyective: $  (\forall v \in A^n)( \forall i : \mathbb{Z} ) (0 < i < |v| - 1  \implies v_i = ((h(v) div 10^{i-1})  mod 10)  ) $
 
@@ -44,22 +44,62 @@ Where key of `boardStatusCounter` is the status key of the board & value is the 
 
 The algoithm is the following
 ```java
-private boolean checkDraw() {
-    int h = board.statusKey();
-    if (!areEnoughPieces(h)) return true;
-
-    if (!boardStatusCounter.keys().contains(h)) {
-        boardStatusCounter.insert(h, 1);
+class Boad {
+    //...
+        public int statusKey() {
+        int res = 0;
+        int i = 0;
+        for (Piece piece : piecesArr) {
+            int cord = 0;
+            while (cord < 2) {
+                res += piece.getCoordenate(cord) * Math.pow(10, i);
+                i++; cord++;
+            }
+        }
+        return res;
+    
     }
-    else {
-        int val = boardStatusCounter.get(h)
-        boardStatusCounter.update(h, val+1)
-    };
+    // ...
+}
 
-    if (boardStatusCounter.get(h) == 3) return true;
-    // More draw logic...
+//Referee implementation
+class Refere{
+    // ...
+    private boolean checkDraw() {
+        int h = board.statusKey();
+        if (!areEnoughPieces(h)) return true;
 
-    return false
+        if (!boardStatusCounter.keys().contains(h)) {
+            boardStatusCounter.insert(h, 1);
+        }
+        else {
+            int val = boardStatusCounter.get(h)
+            boardStatusCounter.update(h, val+1)
+        };
+
+        if (boardStatusCounter.get(h) == 3) return true;
+        // More draw logic...
+
+        return false
+    }
+    // ...
 }
 ```
 There are many other cases but the most crucial is this one.
+
+
+
+Now that I have decided the algorithm of Instanciating the board, I can determine how `piecesArray` will be saved and then, understand how the "decode" the key
+
+piecesArr = [wP,wP,wP,wP,wP,wP,wP,wP,wT,wKn,wB,wQ,wK,wB,wKn,wT,bP,bP,bP,bP,bP,bP,bP,bP,bT,bKn,bB,bQ,bK,bB,bKn,bT]
+So a valid status key for the initial status of the board: 
+   x = [(6,0),(6,1),(6,2),(6,3),(6,40),(6,5),(6,6),(6,7),(7,0),(7,1),(7,2),(7,3),(7,4),(7,5),(7,6),(7,7),(1,0),(1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(0,0),(0,1),(0,2),(0,3),(0,4),(0,5),(0,6),(0,7)]
+   statusKey(x) = 706050403020100071615141312111017767574737271707766656464636261606
+
+
+
+For technical problems, I have decided to modify the algorithm of the key generation. As the result of the function `statuskey` will be an Integer of 64 digits, Java can not store an integer of this size neither in an `int` or `long` type. And seeing that a I need Strings to create a `BigInt` and not seeing an intuitive way of creating this String, I have decided to make the `statusKey` function return a String. This string is a representation of the number I've intended to create by the sumatory of the pieces positions in diferent decimals, but It will be created with concatenations.
+
+I'm leaving the line of thoght because I've putted some effort on it, but now I realise that the statusKey now is more trivial.
+   x = [(6,0),(6,1),(6,2),(6,3),(6,40),(6,5),(6,6),(6,7),(7,0),(7,1),(7,2),(7,3),(7,4),(7,5),(7,6),(7,7),(1,0),(1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(0,0),(0,1),(0,2),(0,3),(0,4),(0,5),(0,6),(0,7)]
+    statusKey(x) = "6061626364656667707172737475767710111213141516170001020304050607"
