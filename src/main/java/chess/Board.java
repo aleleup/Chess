@@ -6,10 +6,12 @@ import chess.pieces.*;
 public class Board {
     private Piece[][] board; // 8x8 chess board
     private Piece[] piecesArr; // 0 -> 15 whites val pieces // 15 -> 31 blacks val pieces
+    private King[] kingsAccess;
     // val pieces -> {King, Queen, Tower, Knights, Bishops}
     public Board(){
         board = new Piece[8][8];
-        piecesArr = new Piece[32]; 
+        piecesArr = new Piece[32];
+        kingsAccess = new King[2];
         int piecesArrIndex = 0;
         for (int id = 0; id < 2; id ++) {
             int pawnRow = id == 1 ? 1 : 6;
@@ -52,6 +54,8 @@ public class Board {
                     King k = new King(id, valPiecesPos);
                     this.insert(k, valPiecesRow, col, piecesArrIndex);                
                     piecesArrIndex++;
+
+                    kingsAccess[id] = k;
                 } 
                 System.out.print(piecesArrIndex);
    
@@ -63,19 +67,7 @@ public class Board {
         Piece pieceTaken = board[newPos[0]][newPos[1]];
         Piece pieceToMove = board[currentPos[0]][currentPos[1]];
         
-    //      ### Check if it is a legal move ###
-        Boolean isInRange = false;
-        ArrayList<int[]> validRange = pieceToMove.rangeOfMovement();
-        int i = 0;
-        while (!isInRange && i < validRange.size()) {
-            int[] pos = validRange.get(i);
-             if (pos[0] == newPos[0] && pos[1] == newPos[1]) {
-                isInRange = true;
-            }
-            i++;
-        }
-
-        if (!isInRange || (pieceTaken != null && pieceTaken.getTeamId() == pieceToMove.getTeamId()) ) return false;
+        if (!isLegalMove(pieceToMove, newPos)) return false;
        
         if (pieceTaken != null && pieceTaken.getTeamId() != pieceToMove.getTeamId()) {
             int[] outOfRangePos = {8, 8};
@@ -84,7 +76,7 @@ public class Board {
         pieceToMove.move(newPos);
         board[newPos[0]][newPos[1]] = pieceToMove;
         board[currentPos[0]][currentPos[1]] = null;
-
+        
         return true;
     };
 
@@ -121,11 +113,48 @@ public class Board {
     }
     
     // Private Methods:
-        private void insert(Piece p, int row, int col, int pieceArrIndex) {
+    private void insert(Piece p, int row, int col, int pieceArrIndex) {
             this.piecesArr[pieceArrIndex] = p;
             this.board[row][col] = p;
             // pieceArrIndex++; JAVA passes primitive values by copy and there's
             //  no way to pass the reference of pieceArrIndex. There's nothing else to do but to
             //  increment  pieceArrIndex outside the function
+    }
+    private boolean isLegalMove(Piece piece, int[] newPos) {
+        // King of the team is in check but trying to move other piece
+        // if (piece.getName() != "K" && kingsAccess[piece.getTeamId()].getIsInCheck()) return false;
+        
+        Piece pieceTaken = board[newPos[0]][newPos[1]];
+
+
+        // Check newPos is in rangeOfMovement
+        Boolean isInRange = false;
+        ArrayList<int[]> range = piece.rangeOfMovement();
+        // int i = 0;
+        for (int i = 0; (i < range.size() && !isInRange); i++){
+            int[] pos = range.get(i);
+             if (pos[0] == newPos[0] && pos[1] == newPos[1]) {
+                isInRange = true;
+            }
+            i++;
+        }
+        if (!isInRange) return false;
+
+
+        // Check if there's a piece between pieceToMove and newPos. I only care if `piece` isn't a Knight 
+        if (piece.getName() != "Kn"){
+            ArrayList<int[]> subRange = piece.subRangeOfMovement(newPos);
+            for (int i = 0; i < subRange.size(); i++) {
+                int[] pos = subRange.get(i);
+                Piece pieceInTheMiddle = this.board[pos[0]][pos[1]];
+                if (pieceInTheMiddle != null) return false;
+            }
+        }
+
+        // TODO [VALIDATION]: CHECK IF THERE IS A CHECK
+
+        // Check if player is taking own piece.
+        if (pieceTaken != null && pieceTaken.getTeamId() == piece.getTeamId()) return false;
+        return true;
     }
 }

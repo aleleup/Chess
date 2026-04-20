@@ -14,17 +14,18 @@ public class Knight extends Pawn {
         ArrayList<int[]> res = new ArrayList<int[]>();
         int i = 2;
         while (i > -3){
-            if (i == 0) continue;
-            int j = 1 + i % 2;
-            if (this.isCoordInRange(this.pos[0] + i) && this.isCoordInRange(this.pos[1] + j)) {
-                int[] posInRange = {this.pos[0] + i, this.pos[1] + j};
-                res.add(posInRange);
+            if (i != 0){
+                int j = 1 + i % 2;
+                if (this.isCoordInRange(this.pos[0] + i) && this.isCoordInRange(this.pos[1] + j)) {
+                    int[] posInRange = {this.pos[0] + i, this.pos[1] + j};
+                    res.add(posInRange);
+                }
+                if (this.isCoordInRange(this.pos[0] + i) && this.isCoordInRange(this.pos[1] - j)) {
+                    int[] posInRange = {this.pos[0] + i, this.pos[1] - j};
+                    res.add(posInRange);
+                }
             }
-            if (this.isCoordInRange(this.pos[0] + i) && this.isCoordInRange(this.pos[1] - j)) {
-                int[] posInRange = {this.pos[0] + i, this.pos[1] - j};
-                res.add(posInRange);
-            }
-
+            i--;
         }
         return res;
     }

@@ -11,8 +11,8 @@ public class Queen extends Piece {
 
     @Override
     public ArrayList<int[]> rangeOfMovement() {
-        ArrayList<int[]> res = this.bishopRangeOfMovement();
-        res.addAll(this.towerRangeOfMovement());
+        ArrayList<int[]> res = this.diagonals();
+        res.addAll(this.sidewaysAndVertically());
         return res;
     };
 

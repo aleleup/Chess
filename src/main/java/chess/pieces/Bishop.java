@@ -12,6 +12,6 @@ public class Bishop extends Piece {
 
     @Override
     public ArrayList<int[]> rangeOfMovement() {
-        return this.bishopRangeOfMovement();
+        return this.diagonals();
     }
 }

@@ -56,17 +56,18 @@ public class BoardTests {
 
         assertFalse(board.move(wHorse, invalidHorse));
         System.out.println(board.toString());
+        String sixthKey = "6061626344556667707172737475767710111233341516170001020304050607";
         System.out.println(board.statusKey());
-        assertEquals(board.statusKey(), fivethKey);
+        assertEquals(board.statusKey(), sixthKey);
 
-    //     // white eats 
-    //     wpawnPos[0] = 4 ;wpawnPos[1] = 4;
-    //     wnewPawnPos[0] = 3; wnewPawnPos[1] = 3; 
-    //     assertTrue(board.move(wpawnPos, wnewPawnPos));
-    //     System.out.println(board.toString());
-    //     String sixthKey = "6061626333556667707172737475767710111288341516170001020304050607";
-    //     System.out.println(board.statusKey());
-    //     assertEquals(board.statusKey(), sixthKey);
+        // white eats 
+        wpawnPos[0] = 4 ;wpawnPos[1] = 4;
+        wnewPawnPos[0] = 3; wnewPawnPos[1] = 3; 
+        assertTrue(board.move(wpawnPos, wnewPawnPos));
+        System.out.println(board.toString());
+        String seventhKey = "6061626333556667707172737475767710111288341516170001020304050607";
+        System.out.println(board.statusKey());
+        assertEquals(board.statusKey(), seventhKey);
     }
 
 }

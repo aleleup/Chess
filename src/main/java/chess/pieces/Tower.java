@@ -12,6 +12,6 @@ public class Tower extends Piece {
 
     @Override
     public ArrayList<int[]> rangeOfMovement() {
-        return this.towerRangeOfMovement();
+        return this.sidewaysAndVertically();
     }
 }
