@@ -2,7 +2,7 @@ package chess.pieces;
 
 import java.util.ArrayList;
 
-public class Knight extends Pawn {
+public class Knight extends Piece {
     public Knight(int teamId, int[] pos) {
         super(teamId, pos);
         this.val += 3;

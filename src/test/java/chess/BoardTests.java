@@ -68,6 +68,62 @@ public class BoardTests {
         String seventhKey = "6061626333556667707172737475767710111288341516170001020304050607";
         System.out.println(board.statusKey());
         assertEquals(board.statusKey(), seventhKey);
+
+        // ### TESTING PAWN VALIDATION
+
+        // black advances  
+        bpawnPos[0] = 1 ;bpawnPos[1] = 0;
+        bnewPawnPos[0] = 3; bnewPawnPos[1] = 0; 
+        assertTrue(board.move(bpawnPos, bnewPawnPos));
+        System.out.println(board.toString());
+        String eighthKey = "6061626333556667707172737475767730111288341516170001020304050607";
+        System.out.println(board.statusKey());
+        assertEquals(board.statusKey(), eighthKey);
+
+        // white advances  
+        wpawnPos[0] = 6 ;wpawnPos[1] = 0;
+        wnewPawnPos[0] = 4; wnewPawnPos[1] = 0; 
+        assertTrue(board.move(wpawnPos, wnewPawnPos));
+        System.out.println(board.toString());
+        String ninethKey = "4061626333556667707172737475767730111288341516170001020304050607";
+        System.out.println(board.statusKey());
+        assertEquals(board.statusKey(), ninethKey);
+
+        // black tries to take pawn in front of him
+        bpawnPos[0] = 3 ;bpawnPos[1] = 0;
+        bnewPawnPos[0] = 4; bnewPawnPos[1] = 0; 
+        assertFalse(board.move(bpawnPos, bnewPawnPos));
+        System.out.println(board.toString());
+        System.out.println(board.statusKey());
+        assertEquals(board.statusKey(), ninethKey);
+
+        
+        // black tries to advance by it's diagonal
+        bpawnPos[0] = 3 ;bpawnPos[1] = 0;
+        bnewPawnPos[0] = 4; bnewPawnPos[1] = 1; 
+        assertFalse(board.move(bpawnPos, bnewPawnPos));
+        System.out.println(board.toString());
+        System.out.println(board.statusKey());
+        assertEquals(board.statusKey(), ninethKey);
+
+
+        // black advances
+        bpawnPos[0] = 1 ;bpawnPos[1] = 1;
+        bnewPawnPos[0] = 3; bnewPawnPos[1] = 1; 
+        assertTrue(board.move(bpawnPos, bnewPawnPos));
+        System.out.println(board.toString());
+        String tenthKey = "4061626333556667707172737475767730311288341516170001020304050607";
+        System.out.println(board.statusKey());
+        assertEquals(board.statusKey(), tenthKey);
+
+        // white takes pawn legaly
+        wpawnPos[0] = 4 ;wpawnPos[1] = 0;
+        wnewPawnPos[0] = 3; wnewPawnPos[1] = 1; 
+        assertTrue(board.move(wpawnPos, wnewPawnPos));
+        System.out.println(board.toString());
+        String eleventhKey = "3161626333556667707172737475767730881288341516170001020304050607";
+        System.out.println(board.statusKey());
+        assertEquals(board.statusKey(), eleventhKey);
     }
 
 }

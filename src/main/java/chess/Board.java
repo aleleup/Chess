@@ -66,17 +66,33 @@ public class Board {
     public Boolean move(int[] currentPos, int[] newPos) {
         Piece pieceTaken = board[newPos[0]][newPos[1]];
         Piece pieceToMove = board[currentPos[0]][currentPos[1]];
-        
-        if (!isLegalMove(pieceToMove, newPos)) return false;
+        King myKing = kingsAccess[pieceToMove.getTeamId()];
+        if (myKing.getIsInCheck()) {
+            // return this.kingInCheckCase()
+        }
+
+        if (!isLegalMove(pieceToMove, pieceTaken, newPos)) return false;
        
-        if (pieceTaken != null && pieceTaken.getTeamId() != pieceToMove.getTeamId()) {
+        if (pieceTaken != null) {
             int[] outOfRangePos = {8, 8};
             pieceTaken.move(outOfRangePos);
         };
         pieceToMove.move(newPos);
         board[newPos[0]][newPos[1]] = pieceToMove;
         board[currentPos[0]][currentPos[1]] = null;
-        
+        this.checkNewCheck(myKing);
+        if (myKing.getIsInCheck()) { // Case the move makes my king at check (Ilegal)
+            if (pieceTaken != null) {
+                pieceTaken.move(newPos);
+            };
+            pieceToMove.move(currentPos);
+            board[newPos[0]][newPos[1]] = pieceTaken;
+            board[currentPos[0]][currentPos[1]] = pieceToMove;
+            return false;
+            } // Everything back to normal
+
+        // 
+        this.checkNewCheck(kingsAccess[(pieceToMove.getTeamId() + 1) % 2]); // Checking if other team's got checked
         return true;
     };
 
@@ -100,8 +116,9 @@ public class Board {
         for (Piece[] row : this.board) {
             String rowString = "|";
             for (Piece p : row) {
-                if (p == null) {rowString+= " |"; continue;}
-                rowString +=  p.getName() + "|";
+                if (p == null) rowString+= "  |";
+                else rowString += (p.getTeamId() == 0 ? "w" : "b") + p.getName() + "|";
+
             }
             res += "\n" + rowString;
         }
@@ -112,7 +129,7 @@ public class Board {
         return res;
     }
     
-    // Private Methods:
+    // #### Private Methods: ###
     private void insert(Piece p, int row, int col, int pieceArrIndex) {
             this.piecesArr[pieceArrIndex] = p;
             this.board[row][col] = p;
@@ -120,13 +137,18 @@ public class Board {
             //  no way to pass the reference of pieceArrIndex. There's nothing else to do but to
             //  increment  pieceArrIndex outside the function
     }
-    private boolean isLegalMove(Piece piece, int[] newPos) {
-        // King of the team is in check but trying to move other piece
-        // if (piece.getName() != "K" && kingsAccess[piece.getTeamId()].getIsInCheck()) return false;
+    private boolean isLegalMove(Piece piece, Piece pieceTaken,int[] newPos) {
+
         
-        Piece pieceTaken = board[newPos[0]][newPos[1]];
-
-
+        // TODO [VALIDATION]: KING IN CHECK CASE
+        
+        // PAWN ILEGAL CASES
+        if  (piece.getName() == "P" && (
+                // Taking a piece in front of a pawn || Moveing a pawn diagonaly
+                (pieceTaken != null && piece.getCoordenate(1) == newPos[1]) || 
+                (pieceTaken == null && piece.getCoordenate(1) != newPos[1])
+            )) return false;
+        
         // Check newPos is in rangeOfMovement
         Boolean isInRange = false;
         ArrayList<int[]> range = piece.rangeOfMovement();
@@ -136,7 +158,6 @@ public class Board {
              if (pos[0] == newPos[0] && pos[1] == newPos[1]) {
                 isInRange = true;
             }
-            i++;
         }
         if (!isInRange) return false;
 
@@ -151,10 +172,93 @@ public class Board {
             }
         }
 
-        // TODO [VALIDATION]: CHECK IF THERE IS A CHECK
 
         // Check if player is taking own piece.
-        if (pieceTaken != null && pieceTaken.getTeamId() == piece.getTeamId()) return false;
+        if (pieceTaken != null && 
+        (pieceTaken.getTeamId() == piece.getTeamId() || (pieceTaken == kingsAccess[0] || pieceTaken == kingsAccess[1])) ) return false;
         return true;
+    }
+
+    /**
+     * process `checkNewCheck`: Inspects if a given King k is being attacked by an other teams key.
+     * Core Idea: From the kings perspective, look for enemies pieces.
+     *  A king has, in the worts case, 8 positions to move. But these positions are in this directions:
+     *      2 diagonals: v_1 = (k.pos) + (-1, 1); v_2 = (k.pos) + (1,1)
+     *      side-ways: v_3 = (k.pos) + (0, 1);
+     *      Front & Back: v_4 = (k.pos) + (1, 0)
+     *  I can make a Line for each directional vector,  L : x * v_n + (k.pos)
+     * Then there is the function p(x) = x * v_n + (k.pos) that gives a point in the line.
+     * Then I assume there is an int a for then to store P = {p(a), p(-a)} and for each P_m I check:
+     *      1) Is P_m outside of the board?
+     *      2) Is there a piece at P_m?
+     * If either of those questions is true, then I do not want to continue searching at that direction. 
+     * For that I'll use dirValidator: {BoolxBool} where dirValidator_m is related to P_m. 
+     * Else if I'm inside the board and there is no piece at P_m I continue the search with P = {p(a+1), p(-a-1)}
+
+        When Is the king at check:
+            1) When at P_m is a piece from k.id != piece.id ^ k is at rangeOfMovement of piece
+            2) Special cases:
+                Pawn: King needs to be at a diagonal of a pawn
+                Knight: See them appart beacuse of their range of movement
+
+    */
+
+    private void checkNewCheck(King k) {
+        int[][] directionalVectors = {
+            {1, -1}, {1, 0}, {1, 1}, {0,1}
+        };
+        int[] kPos = {k.getCoordenate(0), k.getCoordenate(1)};
+
+        for (int[] v : directionalVectors) {
+            boolean inRange = true;
+            int x = 1;
+            boolean[] dirValidator = {true, true}; // Answers if it's worth to keep looking at positionInLine[i]?  
+            while (inRange) {
+                int[][] pointsInLine = {
+                {x * v[0] + kPos[0], x * v[1] + kPos[1]},
+                {-x * v[0] + kPos[0], -x * v[1] + kPos[1]}
+                };
+                for (int i = 0; i < 2; i++) {
+                    int[] p = pointsInLine[i];
+                    if (!dirValidator[i] ) continue;
+                    if (!isInBoard(p)) { 
+                        dirValidator[i] = false; 
+                        continue;
+                     }
+                    Piece possiblePiece = this.board[p[0]][p[1]];
+                    
+                    if (possiblePiece == null) continue;
+                    
+                    if (possiblePiece.getTeamId() == k.getTeamId() || 
+                        (possiblePiece.getTeamId() != k.getTeamId() && 
+                        !this.isInRangeOfMovement(possiblePiece, kPos))
+                        ) dirValidator[i] = false; 
+
+                    else { // TODO: VALIDATE PAWN IN FRONT OF KING CASE
+                            dirValidator[i] = false;
+                            k.setIsInCheck(true);
+                            k.addAnnoyer(possiblePiece);
+                    }
+                }
+                if (!dirValidator[0] && !dirValidator[1]) inRange = false;
+                x++;
+            }
+        }
+    }
+
+    private boolean isInBoard(int[] p) {
+        return 0 <= p[0] && p[0]  < 8 &&  0 <= p[1] && p[1]  < 8;
+    }
+
+    private boolean isInRangeOfMovement(Piece piece, int[] newPos) {
+        Boolean isInRange = false;
+        ArrayList<int[]> range = piece.rangeOfMovement();
+        for (int i = 0; (i < range.size() && !isInRange); i++){
+            int[] pos = range.get(i);
+             if (pos[0] == newPos[0] && pos[1] == newPos[1]) {
+                isInRange = true;
+            }
+        }
+        return isInRange;
     }
 }

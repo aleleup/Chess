@@ -90,7 +90,7 @@ public abstract class Piece {
         // If they are at a diagonal, then abs(v[0]) == abs(v[1]). 
         // As I want the unitary vector I'll divide each coordinate by abs(v[0]) if v[0] != 0, else by abs(v[1]) 
         v[0] = v[0] != 0 ? v[0]/Math.abs(v[0]) : 0;   
-        v[1] = v[1] != 1 ? v[1]/Math.abs(v[1]) : 0;
+        v[1] = v[1] != 0 ? v[1]/Math.abs(v[1]) : 0;
         
         if (distance(pointsInLine(1, v, this.pos), pos) < distance(this.pos, pos)) { // Getting closer to `pos` by incrementing x
             int x = 1;

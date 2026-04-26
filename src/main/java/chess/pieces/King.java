@@ -4,11 +4,12 @@ import java.util.ArrayList;
 
 public class King extends Piece{
     private boolean isInCheck; 
-
+    private ArrayList<Piece> annoyers; //Pieces that are checking me
     public King(int teamId, int[] pos) {
         super(teamId, pos);
         this.isInCheck = false;
         this.name = "K";
+        this.annoyers = new ArrayList<Piece>();
     }
 
     @Override
@@ -35,4 +36,10 @@ public class King extends Piece{
     };
 
     public boolean getIsInCheck() { return this.isInCheck; }
+
+    public ArrayList<Piece> getAnnoyers() { return new ArrayList<>(annoyers); }
+
+    public void addAnnoyer(Piece p) { annoyers.add(p); }
+
+    public Piece delAnnoyer(int i) { return annoyers.remove(i); }
 }
