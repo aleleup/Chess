@@ -99,7 +99,8 @@ public class Board {
     public String statusKey() {
         String res = "";
         for (Piece piece : piecesArr) {
-            String pieceNotation = "" + piece.getCoordenate(0)  + piece.getCoordenate(1);            
+            int[] piecePos = piece.getPosition().getPos();
+            String pieceNotation = "" + piecePos[0]  + piecePos[1];            
             res += pieceNotation;
         }
         return res;
@@ -143,30 +144,26 @@ public class Board {
         // TODO [VALIDATION]: KING IN CHECK CASE
         
         // PAWN ILEGAL CASES
-        if  (piece.getName() == "P" && (
-                // Taking a piece in front of a pawn || Moveing a pawn diagonaly
-                (pieceTaken != null && piece.getCoordenate(1) == newPos[1]) || 
-                (pieceTaken == null && piece.getCoordenate(1) != newPos[1])
-            )) return false;
-        
-        // Check newPos is in rangeOfMovement
-        Boolean isInRange = false;
-        ArrayList<int[]> range = piece.rangeOfMovement();
-        // int i = 0;
-        for (int i = 0; (i < range.size() && !isInRange); i++){
-            int[] pos = range.get(i);
-             if (pos[0] == newPos[0] && pos[1] == newPos[1]) {
-                isInRange = true;
-            }
+        if  (piece.getName() == "P") { 
+            int[] piecePos = piece.getPosition().getPos();
+            if ( // Taking a piece in front of a pawn || Moveing a pawn diagonaly
+                (pieceTaken != null && piecePos[1] == newPos[1]) || 
+                (pieceTaken == null && piecePos[1] != newPos[1])
+            ) return false;
         }
-        if (!isInRange) return false;
+        
+    
+        if (!this.isInRangeOfMovement(piece, newPos)) return false;
 
 
         // Check if there's a piece between pieceToMove and newPos. I only care if `piece` isn't a Knight 
         if (piece.getName() != "Kn"){
-            ArrayList<int[]> subRange = piece.subRangeOfMovement(newPos);
+            MatrixPoint piecePos = piece.getPosition();
+            MatrixPoint newPosPoint = new MatrixPoint(newPos[0], newPos[1]);
+            ArrayList<MatrixPoint> subRange = piecePos.vectorsInBetween(newPosPoint);
             for (int i = 0; i < subRange.size(); i++) {
-                int[] pos = subRange.get(i);
+                MatrixPoint p = subRange.get(i);
+                int[] pos = p.getPos();
                 Piece pieceInTheMiddle = this.board[pos[0]][pos[1]];
                 if (pieceInTheMiddle != null) return false;
             }
@@ -207,7 +204,7 @@ public class Board {
         int[][] directionalVectors = {
             {1, -1}, {1, 0}, {1, 1}, {0,1}
         };
-        int[] kPos = {k.getCoordenate(0), k.getCoordenate(1)};
+        MatrixPoint kPos = k.getPosition();
 
         for (int[] v : directionalVectors) {
             boolean inRange = true;
@@ -215,23 +212,24 @@ public class Board {
             boolean[] dirValidator = {true, true}; // Answers if it's worth to keep looking at positionInLine[i]?  
             while (inRange) {
                 int[][] pointsInLine = {
-                {x * v[0] + kPos[0], x * v[1] + kPos[1]},
-                {-x * v[0] + kPos[0], -x * v[1] + kPos[1]}
-                };
+                {x * v[0] + kPos.getPos()[0], x * v[1] + kPos.getPos()[1]},
+                {-x * v[0] + kPos.getPos()[0], -x * v[1] + kPos.getPos()[1]}
+                };  
                 for (int i = 0; i < 2; i++) {
-                    int[] p = pointsInLine[i];
+                    MatrixPoint p = new MatrixPoint(pointsInLine[i][0], pointsInLine[i][1]);
+                    
                     if (!dirValidator[i] ) continue;
-                    if (!isInBoard(p)) { 
+                    if (!p.isPointInRange(0, 8)) { 
                         dirValidator[i] = false; 
                         continue;
                      }
-                    Piece possiblePiece = this.board[p[0]][p[1]];
+                    int[] pPos = p.getPos();
+                    Piece possiblePiece = this.board[pPos[0]][pPos[1]];
                     
                     if (possiblePiece == null) continue;
-                    
                     if (possiblePiece.getTeamId() == k.getTeamId() || 
                         (possiblePiece.getTeamId() != k.getTeamId() && 
-                        !this.isInRangeOfMovement(possiblePiece, kPos))
+                        !this.isInRangeOfMovement(possiblePiece, kPos.getPos()))
                         ) dirValidator[i] = false; 
 
                     else { // TODO: VALIDATE PAWN IN FRONT OF KING CASE
@@ -244,10 +242,6 @@ public class Board {
                 x++;
             }
         }
-    }
-
-    private boolean isInBoard(int[] p) {
-        return 0 <= p[0] && p[0]  < 8 &&  0 <= p[1] && p[1]  < 8;
     }
 
     private boolean isInRangeOfMovement(Piece piece, int[] newPos) {

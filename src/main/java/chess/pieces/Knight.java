@@ -16,12 +16,12 @@ public class Knight extends Piece {
         while (i > -3){
             if (i != 0){
                 int j = 1 + i % 2;
-                if (this.isCoordInRange(this.pos[0] + i) && this.isCoordInRange(this.pos[1] + j)) {
-                    int[] posInRange = {this.pos[0] + i, this.pos[1] + j};
+                if (this.isCoordInRange(this.pos.getPos()[0] + i) && this.isCoordInRange(this.pos.getPos()[1] + j)) {
+                    int[] posInRange = {this.pos.getPos()[0] + i, this.pos.getPos()[1] + j};
                     res.add(posInRange);
                 }
-                if (this.isCoordInRange(this.pos[0] + i) && this.isCoordInRange(this.pos[1] - j)) {
-                    int[] posInRange = {this.pos[0] + i, this.pos[1] - j};
+                if (this.isCoordInRange(this.pos.getPos()[0] + i) && this.isCoordInRange(this.pos.getPos()[1] - j)) {
+                    int[] posInRange = {this.pos.getPos()[0] + i, this.pos.getPos()[1] - j};
                     res.add(posInRange);
                 }
             }

@@ -17,11 +17,11 @@ public class King extends Piece{
         ArrayList<int[]> res = new ArrayList<int[]>();
         int i = -1;
         while (i < 2) {
-            if (!this.isCoordInRange(this.pos[0] + i)) continue;
+            if (!this.isCoordInRange(this.pos.getPos()[0] + i)) continue;
             int j = -1;
             while (j < 2) {
-                if (!this.isCoordInRange(this.pos[1] + j)) continue;
-                int[] positionInRange = {this.pos[0]+i, this.pos[1] + j};
+                if (!this.isCoordInRange(this.pos.getPos()[1] + j)) continue;
+                int[] positionInRange = {this.pos.getPos()[0]+i, this.pos.getPos()[1] + j};
                 res.add(positionInRange);
                 j++;
             }
