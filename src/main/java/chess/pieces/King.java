@@ -31,15 +31,18 @@ public class King extends Piece{
         return res;
     }
 
-    public void setIsInCheck(boolean b) {
-        isInCheck = b;
-    };
-
     public boolean getIsInCheck() { return this.isInCheck; }
 
     public ArrayList<Piece> getAnnoyers() { return new ArrayList<>(annoyers); }
 
-    public void addAnnoyer(Piece p) { annoyers.add(p); }
+    public void addAnnoyer(Piece p) { 
+        this.isInCheck = true;
+        this.annoyers.add(p); 
+    }
 
-    public Piece delAnnoyer(int i) { return annoyers.remove(i); }
+    public void delAnnoyer(int i) { 
+        this.annoyers.remove(i);
+        if (this.annoyers.size() == 0) this.isInCheck = false;
+         
+    }
 }

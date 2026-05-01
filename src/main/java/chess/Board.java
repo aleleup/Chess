@@ -68,7 +68,7 @@ public class Board {
         Piece pieceToMove = board[currentPos[0]][currentPos[1]];
         King myKing = kingsAccess[pieceToMove.getTeamId()];
         if (myKing.getIsInCheck()) {
-            // return this.kingInCheckCase()
+            // TODO [VALIDATION]: KING IN CHECK CASE
         }
 
         if (!isLegalMove(pieceToMove, pieceTaken, newPos)) return false;
@@ -141,7 +141,6 @@ public class Board {
     private boolean isLegalMove(Piece piece, Piece pieceTaken,int[] newPos) {
 
         
-        // TODO [VALIDATION]: KING IN CHECK CASE
         
         // PAWN ILEGAL CASES
         if  (piece.getName() == "P") { 
@@ -232,16 +231,30 @@ public class Board {
                         !this.isInRangeOfMovement(possiblePiece, kPos.getPos()))
                         ) dirValidator[i] = false; 
 
-                    else { // TODO: VALIDATE PAWN IN FRONT OF KING CASE
-                            dirValidator[i] = false;
-                            k.setIsInCheck(true);
+                    // Case avoiding when an enemy pawn is infront of the king to not get a game error (falsy check)   
+                    else {
+                        dirValidator[i] = false;
+                        if (possiblePiece.getName() != "P" || possiblePiece.getPosition().getPos()[0] != kPos.getPos()[0]) {
                             k.addAnnoyer(possiblePiece);
-                    }
+                       }
+                }
                 }
                 if (!dirValidator[0] && !dirValidator[1]) inRange = false;
                 x++;
             }
         }
+
+        // SPECIAL CASES: Kingts. White knights are at indexes 9 and 14. black knights are at indexes 9 + 16 = 25 and 14 + 16 = 30
+        int kn1Index = k.getTeamId() == 0 ? 25 : 9;
+        int k2Index = k.getTeamId() == 0 ?  30 : 14;
+        Piece[] knightsArray = {piecesArr[kn1Index], piecesArr[k2Index]};
+
+        for (Piece kn : knightsArray) {
+            if (this.isInRangeOfMovement(kn, k.getPosition().getPos())) {
+                k.addAnnoyer(kn);
+            }
+        }
+
     }
 
     private boolean isInRangeOfMovement(Piece piece, int[] newPos) {
