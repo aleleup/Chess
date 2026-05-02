@@ -126,5 +126,29 @@ public class BoardTests {
         assertEquals(board.statusKey(), eleventhKey);
     }
 
+    @Test
+    void testSettingBoardFromKey(){
+        Board board = new Board();
+        // 1st status
+        System.out.println(board.toString());
+        String firstKey = "6061626364656667707172737475767710111213141516170001020304050607";
+        System.out.println(board.statusKey());
+        assertEquals(board.statusKey(), firstKey);
+
+        // 2nd Status
+        String key2 = "3161626333556667707172737475767730881288341516170001020304050607";
+        board.setBoardFromKey(key2);
+        System.out.println(board.toString());
+        System.out.println(board.statusKey());
+        assertEquals(board.statusKey(), key2);
+
+        // 3rd status random
+        String key3 = "6061626344556667707172737475767710111233341516170001020304050607";
+        board.setBoardFromKey(key3);
+        System.out.println(board.toString());
+        System.out.println(board.statusKey());
+        assertEquals(board.statusKey(), key3);
+    }
+
 }
     

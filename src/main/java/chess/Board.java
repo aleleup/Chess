@@ -109,6 +109,32 @@ public class Board {
     public Piece[] getPieces() {
         return piecesArr;
     };
+
+    /**
+     * 
+     * @param key: Numeric String of length 64 where every digit is in between 0 to 8
+     * Clears current status of the board
+     * Sets the pieces specified in the key
+     * {}
+     */
+    public void setBoardFromKey(String key) {
+        int i = 0;
+        int c = 0;
+        this.board = new Piece[8][8];
+        while (i < 63) {
+            int[] pos = new int[2];
+            pos[0] = key.charAt(i) - '0'; pos[1] = key.charAt(i + 1) - '0';
+            Piece p = piecesArr[c];
+            p.move(pos);
+            MatrixPoint point = new MatrixPoint(pos[0], pos[1]);
+            if (point.isPointInRange(0, 8)) {
+                this.board[pos[0]][pos[1]] = p;
+            }
+            i+=2;
+            c++;
+        }
+        
+    }
     
 
     @Override
