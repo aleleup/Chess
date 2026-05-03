@@ -12,6 +12,7 @@ public class Bishop extends Piece {
 
     @Override
     public ArrayList<int[]> rangeOfMovement() {
-        return this.diagonals();
+        int[][] dirVectors = {{1,1}, {1,-1}};
+        return this.rangeOfMovementByDirVector(dirVectors);
     }
 }

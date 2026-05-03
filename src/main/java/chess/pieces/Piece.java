@@ -39,39 +39,32 @@ public abstract class Piece {
         return this.pos.isPointInRange(0, 8);
     };
 
-    protected ArrayList<int[]> sidewaysAndVertically() {
+    /**
+     * 
+     * @param dirVectors: matrix of 2xn with n the amounts of directional vectors
+     * It requires each coordenate of each vector to be 1 XOR 0
+     * 
+     * @return
+     */
+    protected ArrayList<int[]> rangeOfMovementByDirVector(int[][] dirVectors) {
         ArrayList<int[]> res = new ArrayList<int[]>();
-        int i = 0;
-        while (i < 8) {
-            if (i != this.pos.getPos()[0]) {
-                int[] rowPosInRange = { i, this.pos.getPos()[1] };
-                res.add(rowPosInRange);
+        int[] piecePos = this.pos.getPos();
+        for (int[] v : dirVectors) {
+            int x = 1;
+            boolean[] directionInRange = {true, true};
+            while (directionInRange[0] || directionInRange[1]) {
+                int[][] opositePoints = {
+                    {x*v[0] + piecePos[0], x*v[1] + piecePos[1]},
+                    {-x*v[0] + piecePos[0], -x*v[1] + piecePos[1]},
+                };
+                for (int i = 0; i < 2 ; i++) {
+                    int[] point =opositePoints[i];
+                    if (this.isCoordInRange(point[0]) && this.isCoordInRange(point[1])) res.add(point);
+                    else directionInRange[i] = false;
+                }
+                x++;
             }
-            if (i != this.pos.getPos()[1]) {
-                int[] colPosInRange = { this.pos.getPos()[0], i };
-                res.add(colPosInRange);
-            }
-
         }
-
-        return res;
-    }
-
-    protected ArrayList<int[]> diagonals() {
-        ArrayList<int[]> res = new ArrayList<int[]>();
-        int i = 0;
-        while (i < 8) {
-            if (i != this.pos.getPos()[0]) {
-                int[] rowPosInRange = { i, this.pos.getPos()[1] };
-                res.add(rowPosInRange);
-            }
-            if (i != this.pos.getPos()[1]) {
-                int[] colPosInRange = { this.pos.getPos()[0], i };
-                res.add(colPosInRange);
-            }
-
-        }
-
         return res;
     }
 

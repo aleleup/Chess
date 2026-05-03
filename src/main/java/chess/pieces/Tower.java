@@ -12,6 +12,7 @@ public class Tower extends Piece {
 
     @Override
     public ArrayList<int[]> rangeOfMovement() {
-        return this.sidewaysAndVertically();
+        int[][] dirVectors = {{0,1}, {1,0}};
+        return this.rangeOfMovementByDirVector(dirVectors);
     }
 }

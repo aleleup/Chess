@@ -126,29 +126,79 @@ public class BoardTests {
         assertEquals(board.statusKey(), eleventhKey);
     }
 
+    // @Test
+    // void testSettingBoardFromKey() {
+    //     Board board = new Board();
+    //     // 1st status
+    //     System.out.println(board.toString());
+    //     String firstKey = "6061626364656667707172737475767710111213141516170001020304050607";
+    //     System.out.println(board.statusKey());
+    //     assertEquals(board.statusKey(), firstKey);
+
+    //     // 2nd Status
+    //     String key2 = "3161626333556667707172737475767730881288341516170001020304050607";
+    //     board.setBoardFromKey(key2);
+    //     System.out.println(board.toString());
+    //     System.out.println(board.statusKey());
+    //     assertEquals(board.statusKey(), key2);
+
+    //     // 3rd status random
+    //     String key3 = "6061626344556667707172737475767710111233341516170001020304050607";
+    //     board.setBoardFromKey(key3);
+    //     System.out.println(board.toString());
+    //     System.out.println(board.statusKey());
+    //     assertEquals(board.statusKey(), key3);
+    // }
+
     @Test
-    void testSettingBoardFromKey(){
+    void testMoveingFreelySomePieces(){
         Board board = new Board();
-        // 1st status
+        // Moveing a Bishop
+        String keyb = "8888888888888888888844888888888888888888888888888888888888888888";
+        board.setBoardFromKey(keyb);
         System.out.println(board.toString());
-        String firstKey = "6061626364656667707172737475767710111213141516170001020304050607";
-        System.out.println(board.statusKey());
-        assertEquals(board.statusKey(), firstKey);
 
-        // 2nd Status
-        String key2 = "3161626333556667707172737475767730881288341516170001020304050607";
-        board.setBoardFromKey(key2);
-        System.out.println(board.toString());
-        System.out.println(board.statusKey());
-        assertEquals(board.statusKey(), key2);
+        int[] bPos = {4,4};
+        int[] newPos = {5,5};
+        assertTrue(board.move(bPos, newPos));
 
-        // 3rd status random
-        String key3 = "6061626344556667707172737475767710111233341516170001020304050607";
-        board.setBoardFromKey(key3);
         System.out.println(board.toString());
+        String keyb2 = "8888888888888888888855888888888888888888888888888888888888888888";
         System.out.println(board.statusKey());
-        assertEquals(board.statusKey(), key3);
+        assertEquals(board.statusKey(), keyb2);
+        bPos = newPos.clone();
+        newPos[0] = 3; newPos[1] = 5;
+        assertFalse(board.move(bPos,newPos));
+
+        newPos[0] = 7; newPos[1] = 3;
+        assertTrue(board.move(bPos, newPos));
+        System.out.println(board.toString());
+
+
+
+        // Tower
+        String keyt = "8888888888888888888888888888888888888888888888888888888888888844";
+        board.setBoardFromKey(keyt);
+        System.out.println(board.toString());
+
+        int[] towerPos = {4,4};
+        int[] towerNewPos = {0, 4};
+        assertTrue(board.move(towerPos, towerNewPos));
+        System.out.println(board.toString());
+        towerPos = towerNewPos.clone();
+        
+        towerNewPos[1] = 0;
+        assertTrue(board.move(towerPos, towerNewPos));
+        System.out.println(board.toString());
+
+        towerPos = towerNewPos.clone();
+        towerNewPos[0] = 7; towerNewPos[1] = 7;
+
+        assertFalse(board.move(towerPos, towerNewPos));
+        System.out.println(board.toString());
+
+
+
     }
-
 }
     

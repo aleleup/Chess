@@ -119,5 +119,20 @@ public class Main
         System.out.println(board.toString());
         System.out.println(board.statusKey());
         // assertEquals(board.statusKey(), key3);
+
+
+        // Moveing a Bishop
+        String keyb = "8888888888888888888844888888888888888888888888888888888888888888";
+        board.setBoardFromKey(keyb);
+        System.out.println(board.toString());
+
+        int[] bPos = {4,4};
+        int[] newPos = {5,5};
+        board.move(bPos, newPos);
+
+        System.out.println(board.toString());
+        String keyb2 = "8888888888888888888855888888888888888888888888888888888888888888";
+        System.out.println(board.statusKey());
+        // assertEquals(board.statusKey(), keyb2);
     }
 }

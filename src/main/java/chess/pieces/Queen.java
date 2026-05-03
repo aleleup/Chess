@@ -11,9 +11,8 @@ public class Queen extends Piece {
 
     @Override
     public ArrayList<int[]> rangeOfMovement() {
-        ArrayList<int[]> res = this.diagonals();
-        res.addAll(this.sidewaysAndVertically());
-        return res;
+        int[][] dirVectors = {{1,1}, {1,0}, {1,-1}, {0,1} };
+        return this.rangeOfMovementByDirVector(dirVectors);
     };
 
 }
