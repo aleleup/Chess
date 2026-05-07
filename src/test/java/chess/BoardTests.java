@@ -13,7 +13,6 @@ public class BoardTests {
         String firstKey = "6061626364656667707172737475767710111213141516170001020304050607";
         System.out.println(board.statusKey());
         assertEquals(board.statusKey(), firstKey);
-
         // white moves with success
         int [] wpawnPos = {6,4};
         int [] wnewPawnPos = {4,4};
@@ -201,29 +200,88 @@ public class BoardTests {
     @Test 
     void testKingChecked(){
         // Checking and unChecking white king
+        System.out.println("\n TEST 3 \n");
+
         Board board = new Board();
-        String keyb = "8888888888888888888888745588888888888888888888888888880100888802";
+
+
+        String keyb = "8888888888888888178888745588888888888888888888888888880100888802";
         board.setBoardFromKey(keyb);
         System.out.println(board.toString());
         assertFalse(board.isKingCheckedById(0));
 
-        int[] p1 = {0,2}; int[] np1 = {5,2};
-        assertTrue(board.move(p1, np1));
+        int[] t1 = {0,2}; int[] nt = {5,2};
+        assertTrue(board.move(t1, nt));
         System.out.println(board.toString());
 
         // Trying to avoid check
-        int[] q1 = {7,4}; int[] q2 = {0,7}; int[] q3 = {4,4}; int[] q4 = {7,7}; int[] q5 = {5,2};
-        assertFalse(board.move(q1, q2)); 
-        assertFalse(board.move(q1, q3)); 
-        assertFalse(board.move(q1, q4)); 
+        int[] wq = {7,4}; int[] wq1 = {0,7}; int[] wq2 = {4,4}; int[] wq3 = {7,7}; int[] nq = {5,2};
+        assertFalse(board.move(wq, wq1)); 
+        assertFalse(board.move(wq, wq2)); 
+        assertFalse(board.move(wq, wq3)); 
   
 
         System.out.println(board.toString());
 
 
-        assertTrue(board.move(q1, q5));
+        assertTrue(board.move(wq, nq));
+        assertFalse(board.isKingCheckedById(0));
+        assertFalse(board.isKingCheckedById(1));
 
         System.out.println(board.toString());
+
+
+        int[] bq = {0,1}; int[] nbq = {1,1};
+
+        assertTrue(board.move(bq, nbq));
+
+        System.out.println(board.toString());
+
+        assertTrue(board.isKingCheckedById(0));
+        assertFalse(board.isCheckMate(0));
+        assertFalse(board.isKingCheckedById(1));    
+        System.out.println(board.toString());
+
+
+        int[] tower = {1,7}; int[] trytower = {0,7};
+        assertFalse(board.move(tower, trytower));
+        assertTrue(board.isKingCheckedById(0));
+        assertFalse(board.isCheckMate(0));
+        assertFalse(board.isKingCheckedById(1));    
+        System.out.println(board.toString());
+
+
+        int[] king = {5,5}; int[] tryking = {6,6};
+        assertFalse(board.move(king, tryking));
+        assertTrue(board.isKingCheckedById(0));
+        assertFalse(board.isCheckMate(0));
+        assertFalse(board.isKingCheckedById(1));
+        System.out.println(board.toString());
+
+         int[] tryking2 = {6,5};
+        assertTrue(board.move(king, tryking2));
+        assertFalse(board.isKingCheckedById(0));
+        // assertFalse(board.isCheckMate(0));
+        assertFalse(board.isKingCheckedById(1));
+        System.out.println(board.toString());
+
+
+
+        int[]blackqueen = {1,1}; int[] blackqueenError = {3,3};  
+        assertTrue(board.move(blackqueen, blackqueenError));
+        assertFalse(board.isKingCheckedById(0));
+        // assertFalse(board.isCheckMate(0));
+        assertFalse(board.isKingCheckedById(1));
+        System.out.println(board.toString());
+
+
+        int[] whitequeen = {5,2}; int[] whitequeenMate = {0,2};
+        assertTrue(board.move(whitequeen, whitequeenMate));
+        System.out.println(board.toString());
+
+        assertFalse(board.isKingCheckedById(0));
+        assertTrue(board.isKingCheckedById(1));
+        assertTrue(board.isCheckMate(1));
 
     }
 }

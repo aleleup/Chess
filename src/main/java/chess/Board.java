@@ -79,9 +79,7 @@ public class Board {
         board[currentPos[0]][currentPos[1]] = null;
         this.checkNewCheck(myKing);
         if (myKing.getIsInCheck()) { // Case the move makes my king at check (Ilegal)
-            if (pieceTaken != null) {
-                pieceTaken.move(newPos);
-            };
+            if (pieceTaken != null) pieceTaken.move(newPos);
             pieceToMove.move(currentPos);
             board[newPos[0]][newPos[1]] = pieceTaken;
             board[currentPos[0]][currentPos[1]] = pieceToMove;
@@ -93,6 +91,38 @@ public class Board {
         return true;
     };
 
+
+    public boolean isCheckMate(int id) {
+        int startIndex = id == 0 ? 0 : 16;
+        for (int i = startIndex; i < startIndex + 16 ; i++) {
+            Piece p = piecesArr[i];
+            //Piece is out of game
+            if (!p.getPosition().isPointInRange(0, 8)) continue;
+            for (int[] t : p.rangeOfMovement()) {
+                // Saving current board status
+                Piece possiblePiece = board[t[0]][t[1]];
+                int[] originalPos = p.getPosition().getPos();
+                // Moveing piece, checkig if it is legal (Is a possible move that kills the )
+                boolean isPotencialMove = this.move(originalPos, t);
+
+                if (isPotencialMove) { // then the move has been done. We need to keep things as they were.
+                    
+                    p.move(originalPos);
+                    board[originalPos[0]][originalPos[1]] = p;
+    
+                    if (possiblePiece != null) possiblePiece.move(t);
+                    board[t[0]][t[1]] = possiblePiece;
+                    
+                    
+                    // After all we return false because it exists a legal movement and there isn't a checkmate.
+                    return false;
+                }
+            }
+        }
+
+
+        return true;
+    }
 
     public String statusKey() {
         String res = "";
@@ -132,6 +162,7 @@ public class Board {
     }
     
 
+
     @Override
     public String toString() {
         String res = "\n Board: \n \n";
@@ -148,6 +179,8 @@ public class Board {
         for (Piece piece : piecesArr) {
             res += "|" + (piece == null ? "ERROR: PIECE NOT FOUND" : piece.getName()) + "|";
         }
+
+        res += " \n" + "\n Board Hash: \n" + this.statusKey() + " \n" ;
         return res;
     }
     

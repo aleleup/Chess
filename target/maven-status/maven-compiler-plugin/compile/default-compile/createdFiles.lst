@@ -2,7 +2,6 @@ chess/pieces/Queen.class
 chess/pieces/Tower.class
 chess/pieces/Piece.class
 chess/Board.class
-chess/Referee.class
 chess/pieces/Bishop.class
 chess/Main.class
 chess/pieces/King.class
