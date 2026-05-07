@@ -196,8 +196,34 @@ public class BoardTests {
 
         assertFalse(board.move(towerPos, towerNewPos));
         System.out.println(board.toString());
+    }
+
+    @Test 
+    void testKingChecked(){
+        // Checking and unChecking white king
+        Board board = new Board();
+        String keyb = "8888888888888888888888745588888888888888888888888888880100888802";
+        board.setBoardFromKey(keyb);
+        System.out.println(board.toString());
+        assertFalse(board.isKingCheckedById(0));
+
+        int[] p1 = {0,2}; int[] np1 = {5,2};
+        assertTrue(board.move(p1, np1));
+        System.out.println(board.toString());
+
+        // Trying to avoid check
+        int[] q1 = {7,4}; int[] q2 = {0,7}; int[] q3 = {4,4}; int[] q4 = {7,7}; int[] q5 = {5,2};
+        assertFalse(board.move(q1, q2)); 
+        assertFalse(board.move(q1, q3)); 
+        assertFalse(board.move(q1, q4)); 
+  
+
+        System.out.println(board.toString());
 
 
+        assertTrue(board.move(q1, q5));
+
+        System.out.println(board.toString());
 
     }
 }

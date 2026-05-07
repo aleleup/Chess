@@ -3,14 +3,14 @@ package chess;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class Referee {
+public class Desk {
     private Board board;
     private ArrayList<String[]> whitePlayerCaptures; // Each String[] is [PieceKey, PieceVal]
     private ArrayList<String[]> blackPlayerCaptures;
     private ArrayList<String[]> historyArray; // Each String[] is [PieceKey, PosX, PosY]
     private HashMap<Integer, Integer> boardStatusCounter;
 
-    public Referee() {
+    public Desk() {
         this.board = new Board();
         this.whitePlayerCaptures = new ArrayList<String[]>();
         this.blackPlayerCaptures = new ArrayList<String[]>();

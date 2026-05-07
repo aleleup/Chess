@@ -63,13 +63,10 @@ public class Board {
         }
     };
 
-    public Boolean move(int[] currentPos, int[] newPos) {
+    public boolean move(int[] currentPos, int[] newPos) {
         Piece pieceTaken = board[newPos[0]][newPos[1]];
         Piece pieceToMove = board[currentPos[0]][currentPos[1]];
         King myKing = kingsAccess[pieceToMove.getTeamId()];
-        if (myKing.getIsInCheck()) {
-            // TODO [VALIDATION]: KING IN CHECK CASE
-        }
 
         if (!isLegalMove(pieceToMove, pieceTaken, newPos)) return false;
        
@@ -96,6 +93,7 @@ public class Board {
         return true;
     };
 
+
     public String statusKey() {
         String res = "";
         for (Piece piece : piecesArr) {
@@ -106,9 +104,6 @@ public class Board {
         return res;
     }
     
-    public Piece[] getPieces() {
-        return piecesArr;
-    };
 
     /**
      * 
@@ -156,6 +151,10 @@ public class Board {
         return res;
     }
     
+    public boolean isKingCheckedById(int id) {
+        return this.kingsAccess[id].getIsInCheck();
+    }
+
     // #### Private Methods: ###
     private void insert(Piece p, int row, int col, int pieceArrIndex) {
             this.piecesArr[pieceArrIndex] = p;
@@ -164,6 +163,7 @@ public class Board {
             //  no way to pass the reference of pieceArrIndex. There's nothing else to do but to
             //  increment  pieceArrIndex outside the function
     }
+   
     private boolean isLegalMove(Piece piece, Piece pieceTaken,int[] newPos) {
 
         
@@ -230,7 +230,7 @@ public class Board {
             {1, -1}, {1, 0}, {1, 1}, {0,1}
         };
         MatrixPoint kPos = k.getPosition();
-
+        ArrayList<Piece> kingsAnnoyers = new ArrayList<Piece>();
         for (int[] v : directionalVectors) {
             boolean inRange = true;
             int x = 1;
@@ -261,7 +261,7 @@ public class Board {
                     else {
                         dirValidator[i] = false;
                         if (possiblePiece.getName() != "P" || possiblePiece.getPosition().getPos()[0] != kPos.getPos()[0]) {
-                            k.addAnnoyer(possiblePiece);
+                            kingsAnnoyers.add(possiblePiece);
                        }
                 }
                 }
@@ -277,9 +277,13 @@ public class Board {
 
         for (Piece kn : knightsArray) {
             if (this.isInRangeOfMovement(kn, k.getPosition().getPos())) {
-                k.addAnnoyer(kn);
+                kingsAnnoyers.add(kn);
             }
         }
+
+        // size(kingsAnnoyers > 0) -> k.isIncheck = true;
+        if (kingsAnnoyers.size() > 0) k.setIsInCheck(true);
+        else k.setIsInCheck(false);
 
     }
 

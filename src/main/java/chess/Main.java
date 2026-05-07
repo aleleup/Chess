@@ -1,6 +1,5 @@
 package chess;
 
-
 /**
  * Hello world!
  * 
@@ -134,5 +133,15 @@ public class Main
         String keyb2 = "8888888888888888888855888888888888888888888888888888888888888888";
         System.out.println(board.statusKey());
         // assertEquals(board.statusKey(), keyb2);
+
+
+        board = new Board();
+
+        board.setBoardFromKey("8888888888888888888888745588888888888888888888888888880100888802");
+        System.out.println(board.toString());
+        // assertFalse(board.isKingCheckedById(0));
+
+        int[] p1 = {0,2}; int[] np1 = {5,2};
+        board.move(p1, np1);
     }
 }
