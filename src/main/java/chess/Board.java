@@ -7,6 +7,8 @@ public class Board {
     private Piece[][] board; // 8x8 chess board
     private Piece[] piecesArr; // 0 -> 15 whites val pieces // 15 -> 31 blacks val pieces
     private King[] kingsAccess;
+    private int[] outOfRangePos  = {8,8};
+
     // val pieces -> {King, Queen, Tower, Knights, Bishops}
     public Board(){
         board = new Piece[8][8];
@@ -71,8 +73,7 @@ public class Board {
         if (!isLegalMove(pieceToMove, pieceTaken, newPos)) return false;
        
         if (pieceTaken != null) {
-            int[] outOfRangePos = {8, 8};
-            pieceTaken.move(outOfRangePos);
+            pieceTaken.move(this.outOfRangePos);
         };
         pieceToMove.move(newPos);
         board[newPos[0]][newPos[1]] = pieceToMove;
@@ -86,16 +87,58 @@ public class Board {
             return false;
             } // Everything back to normal
 
-        // 
+
         this.checkNewCheck(kingsAccess[(pieceToMove.getTeamId() + 1) % 2]); // Checking if other team's got checked
         return true;
     };
 
+    public boolean moveAndUpgradePawn(int[] currentPos, int[] newPos, String newPieceName){
+
+        Piece pawn = board[currentPos[0]][currentPos[1]]; 
+        Piece pawnUpgraded;
+        int pawnId = pawn.getTeamId();
+        
+        if (!isLegalMove(pawn, board[newPos[0]][newPos[1]], newPos)) return false;
+
+        if (newPieceName == "Kn"){
+            pawnUpgraded = new Knight(pawnId, newPos);
+        }
+        else if (newPieceName == "B"){
+            pawnUpgraded = new Bishop(pawnId, newPos);
+        } else if (newPieceName == "T"){
+            pawnUpgraded = new Tower(pawnId, newPos);
+        } else if (newPieceName == "Q"){
+            pawnUpgraded = new Queen(pawnId, newPos);
+        } else { return false; }
+
+        // moveing pawn
+        boolean canMove = this.move(currentPos, newPos);
+
+        if (!canMove) return false;
+
+        // exchanging pawn for it's upgrade at board
+        board[newPos[0]][newPos[1]] = pawnUpgraded;
+        // getting pawn out of range
+        pawn.move(this.outOfRangePos);
+
+        // exchanging pawn for it's upgrade at board
+        int startIndex = pawnId == 0 ? 0 : 16;
+        int pawnPos = 0;
+        for (int i = startIndex; i < startIndex + 16;  i++){
+            if (piecesArr[i] == pawn) { // If addreses are the same.
+                pawnPos = i; break;
+            }
+        }
+        piecesArr[pawnPos] = pawnUpgraded;
+        return true;
+
+        // TODO: DELETE PREVIOUS STATUS HASH MAP; 
+    }
 
     public boolean isCheckMate(int id) {
         int startIndex = id == 0 ? 0 : 16;
         for (int i = startIndex; i < startIndex + 16 ; i++) {
-            Piece p = piecesArr[i];
+            Piece p = this.piecesArr[i];
             //Piece is out of game
             if (!p.getPosition().isPointInRange(0, 8)) continue;
             for (int[] t : p.rangeOfMovement()) {
@@ -126,7 +169,7 @@ public class Board {
 
     public String statusKey() {
         String res = "";
-        for (Piece piece : piecesArr) {
+        for (Piece piece : this.piecesArr) {
             int[] piecePos = piece.getPosition().getPos();
             String pieceNotation = "" + piecePos[0]  + piecePos[1];            
             res += pieceNotation;
@@ -149,7 +192,7 @@ public class Board {
         while (i < 63) {
             int[] pos = new int[2];
             pos[0] = key.charAt(i) - '0'; pos[1] = key.charAt(i + 1) - '0';
-            Piece p = piecesArr[c];
+            Piece p = this.piecesArr[c];
             p.move(pos);
             MatrixPoint point = new MatrixPoint(pos[0], pos[1]);
             if (point.isPointInRange(0, 8)) {
@@ -161,8 +204,11 @@ public class Board {
         
     }
     
-
-
+    
+    public boolean isKingCheckedById(int id) {
+        return this.kingsAccess[id].getIsInCheck();
+    }
+    
     @Override
     public String toString() {
         String res = "\n Board: \n \n";
@@ -171,22 +217,19 @@ public class Board {
             for (Piece p : row) {
                 if (p == null) rowString+= "  |";
                 else rowString += (p.getTeamId() == 0 ? "w" : "b") + p.getName() + "|";
-
+                
             }
             res += "\n" + rowString;
         }
         res += "\n Pieces Array: \n";
-        for (Piece piece : piecesArr) {
+        for (Piece piece : this.piecesArr) {
             res += "|" + (piece == null ? "ERROR: PIECE NOT FOUND" : piece.getName()) + "|";
         }
-
+        
         res += " \n" + "\n Board Hash: \n" + this.statusKey() + " \n" ;
         return res;
     }
     
-    public boolean isKingCheckedById(int id) {
-        return this.kingsAccess[id].getIsInCheck();
-    }
 
     // #### Private Methods: ###
     private void insert(Piece p, int row, int col, int pieceArrIndex) {
@@ -198,8 +241,6 @@ public class Board {
     }
    
     private boolean isLegalMove(Piece piece, Piece pieceTaken,int[] newPos) {
-
-        
         
         // PAWN ILEGAL CASES
         if  (piece.getName() == "P") { 
@@ -207,6 +248,7 @@ public class Board {
             if ( // Taking a piece in front of a pawn || Moveing a pawn diagonaly
                 (pieceTaken != null && piecePos[1] == newPos[1]) || 
                 (pieceTaken == null && piecePos[1] != newPos[1])
+
             ) return false;
         }
         
@@ -306,7 +348,7 @@ public class Board {
         // SPECIAL CASES: Kingts. White knights are at indexes 9 and 14. black knights are at indexes 9 + 16 = 25 and 14 + 16 = 30
         int kn1Index = k.getTeamId() == 0 ? 25 : 9;
         int k2Index = k.getTeamId() == 0 ?  30 : 14;
-        Piece[] knightsArray = {piecesArr[kn1Index], piecesArr[k2Index]};
+        Piece[] knightsArray = {this.piecesArr[kn1Index],this.piecesArr[k2Index]};
 
         for (Piece kn : knightsArray) {
             if (this.isInRangeOfMovement(kn, k.getPosition().getPos())) {

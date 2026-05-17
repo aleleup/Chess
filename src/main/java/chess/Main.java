@@ -143,5 +143,25 @@ public class Main
 
         int[] p1 = {0,2}; int[] np1 = {5,2};
         board.move(p1, np1);
+
+        String key1 = "8888888888888817888888888888888888888888888888888888888888888888";
+        board.setBoardFromKey(key1);
+        System.out.println(board.toString());
+        int[] p_0 = {1,7}; int[] p_f = {0,7};
+        board.moveAndUpgradePawn(p_0, p_f, "Q");
+        System.out.println(board.toString());
+
+        board.setBoardFromKey(key1);
+        board.moveAndUpgradePawn(p_0, p_f, "T");
+        System.out.println(board.toString());
+
+        board.setBoardFromKey(key1);
+        board.moveAndUpgradePawn(p_0, p_f, "B");
+        System.out.println(board.toString());
+
+        board.setBoardFromKey(key1);
+        board.moveAndUpgradePawn(p_0, p_f, "Kn");
+        System.out.println(board.toString());
+        
     }
 }
