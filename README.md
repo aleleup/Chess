@@ -1,2 +1,2 @@
 # Chess
-Chess made in java to learn appache cammel
+Chess made in java to learn quarkus cammel
