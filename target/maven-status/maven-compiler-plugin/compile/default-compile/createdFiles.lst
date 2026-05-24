@@ -1,5 +1,5 @@
 chess/pieces/Queen.class
-chess/pieces/Tower.class
+chess/pieces/Rook.class
 chess/pieces/Piece.class
 chess/Board.class
 chess/pieces/Bishop.class

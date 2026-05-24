@@ -175,7 +175,7 @@ public class BoardTests {
 
 
 
-        // Tower
+        // Rook
         String keyt = "8888888888888888888888888888888888888888888888888888888888888844";
         board.setBoardFromKey(keyt);
         System.out.println(board.toString());
@@ -243,8 +243,8 @@ public class BoardTests {
         System.out.println(board.toString());
 
 
-        int[] tower = {1,7}; int[] trytower = {0,7};
-        assertFalse(board.move(tower, trytower));
+        int[] rook = {1,7}; int[] trytower = {0,7};
+        assertFalse(board.move(rook, trytower));
         assertTrue(board.isKingCheckedById(0));
         assertFalse(board.isCheckMate(0));
         assertFalse(board.isKingCheckedById(1));    

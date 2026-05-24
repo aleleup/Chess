@@ -2,9 +2,8 @@ package chess.pieces;
 
 import java.util.ArrayList;
 
-public class Tower extends Piece {
-    
-    public Tower(int teamId, int[] pos){
+public class Rook extends Castler {
+    public Rook(int teamId, int[] pos){
         super(teamId, pos);
         this.val += 5;
         this.name = "T";
@@ -15,4 +14,5 @@ public class Tower extends Piece {
         int[][] dirVectors = {{0,1}, {1,0}};
         return this.rangeOfMovementByDirVector(dirVectors);
     }
+
 }

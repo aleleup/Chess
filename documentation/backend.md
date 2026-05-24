@@ -9,7 +9,7 @@ Having this represatiantion structure:
     public class Board {
         private Piece[][] board; // 8x8 chess board
         private Piece[] piecesArr; // 0 -> 15 whites val pieces // 15 -> 31 blacks val pieces
-        // val pieces -> {King, Queen, Tower, Knights, Bishops}
+        // val pieces -> {King, Queen, Rook, Knights, Bishops}
         public Board(){
             board = new Piece[8][8];
             piecesArr = new Piece[32]; 

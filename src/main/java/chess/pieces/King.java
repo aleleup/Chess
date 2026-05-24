@@ -2,7 +2,7 @@ package chess.pieces;
 
 import java.util.ArrayList;
 
-public class King extends Piece{
+public class King extends Castler{
     private boolean isInCheck; 
     private ArrayList<Piece> annoyers; //Pieces that are checking me
     public King(int teamId, int[] pos) {
@@ -42,5 +42,6 @@ public class King extends Piece{
     public void addAnnoyer(Piece p) { 
         this.annoyers.add(p); 
     }
+
 
 }

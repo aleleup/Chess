@@ -9,7 +9,7 @@ public class Board {
     private King[] kingsAccess;
     private int[] outOfRangePos  = {8,8};
 
-    // val pieces -> {King, Queen, Tower, Knights, Bishops}
+    // val pieces -> {King, Queen, Rook, Knights, Bishops}
     public Board(){
         board = new Piece[8][8];
         piecesArr = new Piece[32];
@@ -33,8 +33,8 @@ public class Board {
             for (int col = 0; col < 8; col++) {
                 int[] valPiecesPos = {valPiecesRow, col};
                 if (col % 7 == 0) { // col in {0, 7}
-                    Tower t = new Tower(id, valPiecesPos);
-                    this.insert(t, valPiecesRow, col, piecesArrIndex);
+                    Rook r = new Rook(id, valPiecesPos);
+                    this.insert(r, valPiecesRow, col, piecesArrIndex);
                     piecesArrIndex++;
                 }
                 if (col % 5 == 1) { // col in {1, 6}
@@ -85,9 +85,9 @@ public class Board {
             board[newPos[0]][newPos[1]] = pieceTaken;
             board[currentPos[0]][currentPos[1]] = pieceToMove;
             return false;
-            } // Everything back to normal
-
-
+        } // Everything back to normal
+        //myKing || rook moved -> that piece can not castle anymore
+        this.checkAndSetCasteling(pieceToMove);        
         this.checkNewCheck(kingsAccess[(pieceToMove.getTeamId() + 1) % 2]); // Checking if other team's got checked
         return true;
     };
@@ -106,7 +106,7 @@ public class Board {
         else if (newPieceName == "B"){
             pawnUpgraded = new Bishop(pawnId, newPos);
         } else if (newPieceName == "T"){
-            pawnUpgraded = new Tower(pawnId, newPos);
+            pawnUpgraded = new Rook(pawnId, newPos);
         } else if (newPieceName == "Q"){
             pawnUpgraded = new Queen(pawnId, newPos);
         } else { return false; }
@@ -132,7 +132,85 @@ public class Board {
         piecesArr[pawnPos] = pawnUpgraded;
         return true;
 
-        // TODO: DELETE PREVIOUS STATUS HASH MAP; 
+    }
+
+    /**
+     * @param kingsPos Requires to be the current position of the king
+     * @param rookPos Requires to be the current position of a rook with same id than the king.
+     * @return Whether it is valid to castle the king or not
+
+        res = false ^ board_0 = bord_f <==> (
+                ¬(king.canCast ^ rook.canCast) v 
+                // there are pieces in the middle or there is a point in between kingsPos and rookPos where the king gets checked
+            ) v
+        res = true ^ (
+            bord_f[kingsPos[0]][kingsPos[1]] = bord_f[rookPos[0]][rookPos[1]] = null ^ (
+                (|rookPos - kingsPos| = 4 -> bord_f[kingsPos[0]][2] = king ^ bord_f[kingsPos[0]][3] = rook) v
+                (|rookPos - kingsPos| = 3 -> bord_f[kingsPos[0]][1] = king ^ bord_f[kingsPos[0]][2] = rook) 
+
+            )
+        )
+    */
+    public boolean casteling(int[] kingsPos, int[] rookPos) {
+        King king = (King) board[kingsPos[0]][kingsPos[1]];
+        Rook rook = (Rook) board[rookPos[0]][rookPos[1]];
+
+
+        // Some piece moved or the king is already at check
+        if (!(king.getCanCastle() && rook.getCanCastle()) || king.getIsInCheck() ) return false;
+
+        ArrayList<MatrixPoint> pointsInBetween = king.getPosition().vectorsInBetween(rook.getPosition());
+        
+        int blocksAppartFromKing = 1; 
+       /*
+            I want to see the trajectory of the casteling. If there is some enemys piece attacking any block in there.
+            I'm going to do that by moveing the king to that position (if there is not a piece in there) and call the checkNewCheck method.
+            If the king is checked in that block, I rollback to keep the originals board status (and returning false).
+            But in the case where the king castels with the most far away rook, there is one block in the trajectory where I don't need to look
+            for a checkand for that I use `blocksAppartFromKing`. Because the kings will always move two possitions to the "right" or to the "left" it will generate an error to return false if I see that there is a check further that what I needed to see.  
+       */
+        for (MatrixPoint currentBlock : pointsInBetween) {
+            int[] pos = currentBlock.getPos();
+            if (board[pos[0]][pos[1]] != null) return false;
+            
+            if (blocksAppartFromKing > 2) continue; // I've seen both blocks where the king will move
+            
+            // Moveing king to currentBlock pos
+            board[kingsPos[0]][kingsPos[1]] = null;
+            board[pos[0]][pos[1]] = king;
+            king.move(pos);
+            this.checkNewCheck(king);
+
+            // Going back to original board and king status
+            board[kingsPos[0]][kingsPos[1]] = king;
+            board[pos[0]][pos[1]] = null;
+            king.move(kingsPos);
+
+            // checking if previous movement got my king checked
+            if (king.getIsInCheck()) {
+                king.setIsInCheck(false);
+                return false;
+            }
+            blocksAppartFromKing++;
+        }
+        // If we get here, then it is legal to castle:
+        int distanceBetweenKingAndRook = Math.abs(kingsPos[1] - rookPos[1]);
+        board[kingsPos[0]][kingsPos[1]] = null;
+        board[rookPos[0]][rookPos[1]] = null;
+        
+        // King is moveing to the "right"
+        if (distanceBetweenKingAndRook == 3) {
+            board[kingsPos[0]][6] = king;
+            board[kingsPos[0]][5] = rook;
+            
+        } else if (distanceBetweenKingAndRook == 4) { // King is moveing to the "left"
+            board[kingsPos[0]][2] = king;
+            board[kingsPos[0]][3] = rook;
+            
+        }
+        rook.setCanCastle(false);
+        king.setCanCastle(false);
+        return true;
     }
 
     public boolean isCheckMate(int id) {
@@ -372,5 +450,17 @@ public class Board {
             }
         }
         return isInRange;
+    }
+
+    private void checkAndSetCasteling (Piece p) {
+        if (p.getName() == "K") {
+            King k = (King) p;
+            k.setCanCastle(false);
+        }
+        if (p.getName() == "R") {
+            Rook r = (Rook) p;
+            r.setCanCastle(false);
+        }
+
     }
 }

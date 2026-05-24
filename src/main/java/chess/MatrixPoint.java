@@ -67,7 +67,7 @@ public class MatrixPoint {
         int[] v = {this.pos[0] - q.getPos()[0], this.pos[1] - q.getPos()[1]};
         // pos is at same row, at same col or at same diagonal
         // If they are at a diagonal, then abs(v[0]) == abs(v[1]). 
-        // As I want the unitary vector I'll divide each coordinate by abs(v[0]) if v[0] != 0, else by abs(v[1]) 
+        // As I want a vector of the form {1,1}, {1,0} or {0,1} I'll divide each coordinate by abs(v[0]) if v[0] != 0, else by abs(v[1]) 
         v[0] = v[0] != 0 ? v[0]/Math.abs(v[0]) : 0;   
         v[1] = v[1] != 0 ? v[1]/Math.abs(v[1]) : 0;
         

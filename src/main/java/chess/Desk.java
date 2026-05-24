@@ -3,6 +3,11 @@ package chess;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+
+//* [TODO] Document the idea of front-end messages: 
+//          [TRY_MOVE]: calls move, [TRY_UPGRADE_PAWN]: calls moveAndUpgradePawn, [TRY_CASTLE]: calls casteling
+// TODO: DELETE PREVIOUS STATUS HASH MAP WHENEVER THE FRONT-END MESSAGE IS [TRY_UPGRADE_PAWN] and the method return true. 
+
 public class Desk {
     private Board board;
     private ArrayList<String[]> whitePlayerCaptures; 
