@@ -152,7 +152,7 @@ public class Main
         System.out.println(board.toString());
 
         board.setBoardFromKey(key1);
-        board.moveAndUpgradePawn(p_0, p_f, "T");
+        board.moveAndUpgradePawn(p_0, p_f, "R");
         System.out.println(board.toString());
 
         board.setBoardFromKey(key1);

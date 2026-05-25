@@ -105,7 +105,7 @@ public class Board {
         }
         else if (newPieceName == "B"){
             pawnUpgraded = new Bishop(pawnId, newPos);
-        } else if (newPieceName == "T"){
+        } else if (newPieceName == "R"){
             pawnUpgraded = new Rook(pawnId, newPos);
         } else if (newPieceName == "Q"){
             pawnUpgraded = new Queen(pawnId, newPos);
@@ -151,7 +151,7 @@ public class Board {
             )
         )
     */
-    public boolean casteling(int[] kingsPos, int[] rookPos) {
+    public boolean castleKing(int[] kingsPos, int[] rookPos) {
         King king = (King) board[kingsPos[0]][kingsPos[1]];
         Rook rook = (Rook) board[rookPos[0]][rookPos[1]];
 
@@ -161,19 +161,10 @@ public class Board {
 
         ArrayList<MatrixPoint> pointsInBetween = king.getPosition().vectorsInBetween(rook.getPosition());
         
-        int blocksAppartFromKing = 1; 
-       /*
-            I want to see the trajectory of the casteling. If there is some enemys piece attacking any block in there.
-            I'm going to do that by moveing the king to that position (if there is not a piece in there) and call the checkNewCheck method.
-            If the king is checked in that block, I rollback to keep the originals board status (and returning false).
-            But in the case where the king castels with the most far away rook, there is one block in the trajectory where I don't need to look
-            for a checkand for that I use `blocksAppartFromKing`. Because the kings will always move two possitions to the "right" or to the "left" it will generate an error to return false if I see that there is a check further that what I needed to see.  
-       */
         for (MatrixPoint currentBlock : pointsInBetween) {
             int[] pos = currentBlock.getPos();
             if (board[pos[0]][pos[1]] != null) return false;
             
-            if (blocksAppartFromKing > 2) continue; // I've seen both blocks where the king will move
             
             // Moveing king to currentBlock pos
             board[kingsPos[0]][kingsPos[1]] = null;
@@ -191,25 +182,27 @@ public class Board {
                 king.setIsInCheck(false);
                 return false;
             }
-            blocksAppartFromKing++;
         }
         // If we get here, then it is legal to castle:
         int distanceBetweenKingAndRook = Math.abs(kingsPos[1] - rookPos[1]);
         board[kingsPos[0]][kingsPos[1]] = null;
         board[rookPos[0]][rookPos[1]] = null;
-        
+        int[] kingNewPos = kingsPos.clone();
+        int[] rookNewPos = rookPos.clone();
         // King is moveing to the "right"
         if (distanceBetweenKingAndRook == 3) {
-            board[kingsPos[0]][6] = king;
-            board[kingsPos[0]][5] = rook;
-            
+            kingNewPos[1] = 6; rookNewPos[1] = 5;            
         } else if (distanceBetweenKingAndRook == 4) { // King is moveing to the "left"
-            board[kingsPos[0]][2] = king;
-            board[kingsPos[0]][3] = rook;
-            
+            kingNewPos[1] = 2; rookNewPos[1] = 3;            
         }
-        rook.setCanCastle(false);
+        board[kingNewPos[0]][kingNewPos[1]] = king;
+        board[rookNewPos[0]][rookNewPos[1]] = rook;
+
+        king.move(kingNewPos);
         king.setCanCastle(false);
+        
+        rook.move(rookNewPos);
+        rook.setCanCastle(false);
         return true;
     }
 
@@ -279,7 +272,7 @@ public class Board {
             i+=2;
             c++;
         }
-        
+        // this.checkNewCheck(kingsAccess[0]); this.checkAndSetCasteling(kingsAccess[1]);
     }
     
     

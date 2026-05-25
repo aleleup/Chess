@@ -6,7 +6,7 @@ public class Rook extends Castler {
     public Rook(int teamId, int[] pos){
         super(teamId, pos);
         this.val += 5;
-        this.name = "T";
+        this.name = "R";
     }
 
     @Override
