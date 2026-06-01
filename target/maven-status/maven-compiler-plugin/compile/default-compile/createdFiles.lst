@@ -1,9 +1,12 @@
-chess/pieces/Queen.class
+chess/MatrixPoint.class
 chess/pieces/Piece.class
+chess/pieces/King.class
+chess/Desk.class
+chess/pieces/Knight.class
+chess/pieces/Queen.class
+chess/pieces/Castler.class
 chess/Board.class
 chess/pieces/Rook.class
 chess/pieces/Bishop.class
 chess/Main.class
-chess/pieces/King.class
 chess/pieces/Pawn.class
-chess/pieces/Knight.class

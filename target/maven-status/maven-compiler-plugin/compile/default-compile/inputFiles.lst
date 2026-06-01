@@ -2,6 +2,7 @@
 /Users/aleleupsz/Desktop/Scripts/Full-Stack/Chess/backend/src/main/java/chess/Desk.java
 /Users/aleleupsz/Desktop/Scripts/Full-Stack/Chess/backend/src/main/java/chess/Main.java
 /Users/aleleupsz/Desktop/Scripts/Full-Stack/Chess/backend/src/main/java/chess/MatrixPoint.java
+/Users/aleleupsz/Desktop/Scripts/Full-Stack/Chess/backend/src/main/java/chess/WebSocketServer.java
 /Users/aleleupsz/Desktop/Scripts/Full-Stack/Chess/backend/src/main/java/chess/pieces/Bishop.java
 /Users/aleleupsz/Desktop/Scripts/Full-Stack/Chess/backend/src/main/java/chess/pieces/Castler.java
 /Users/aleleupsz/Desktop/Scripts/Full-Stack/Chess/backend/src/main/java/chess/pieces/King.java

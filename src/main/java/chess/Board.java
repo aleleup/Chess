@@ -8,6 +8,10 @@ public class Board {
     private Piece[] piecesArr; // 0 -> 15 whites val pieces // 15 -> 31 blacks val pieces
     private King[] kingsAccess;
     private int[] outOfRangePos  = {8,8};
+    // [TODO]
+    private ArrayList<String[]> whitePlayerCaptures; 
+    private ArrayList<String[]> blackPlayerCaptures;
+    private ArrayList<String[]> historyArray;
 
     // val pieces -> {King, Queen, Rook, Knights, Bishops}
     public Board(){
@@ -151,6 +155,7 @@ public class Board {
             )
         )
     */
+
     public boolean castleKing(int[] kingsPos, int[] rookPos) {
         King king = (King) board[kingsPos[0]][kingsPos[1]];
         Rook rook = (Rook) board[rookPos[0]][rookPos[1]];
@@ -160,12 +165,14 @@ public class Board {
         if (!(king.getCanCastle() && rook.getCanCastle()) || king.getIsInCheck() ) return false;
 
         ArrayList<MatrixPoint> pointsInBetween = king.getPosition().vectorsInBetween(rook.getPosition());
-        
+        //If a piece is attacking a block in between the king and the rook but not in the 2 blocks where the king will move,
+        //  then the castle is valid.
+        int blockMoves = 0;
         for (MatrixPoint currentBlock : pointsInBetween) {
             int[] pos = currentBlock.getPos();
             if (board[pos[0]][pos[1]] != null) return false;
             
-            
+            if (blockMoves > 1) continue;
             // Moveing king to currentBlock pos
             board[kingsPos[0]][kingsPos[1]] = null;
             board[pos[0]][pos[1]] = king;
@@ -182,6 +189,7 @@ public class Board {
                 king.setIsInCheck(false);
                 return false;
             }
+            blockMoves++;
         }
         // If we get here, then it is legal to castle:
         int distanceBetweenKingAndRook = Math.abs(kingsPos[1] - rookPos[1]);
@@ -206,7 +214,13 @@ public class Board {
         return true;
     }
 
-    public boolean isCheckMate(int id) {
+    /**
+     * @param id
+     * @return if there is any legal move for the player {id}
+     * The core idea is to check if there is legal move looking at all the pieces of the {id} team.
+     * The reason of this method is to check when a game is over. 
+     */
+    public boolean isStalmate(int id) {
         int startIndex = id == 0 ? 0 : 16;
         for (int i = startIndex; i < startIndex + 16 ; i++) {
             Piece p = this.piecesArr[i];

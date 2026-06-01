@@ -4,45 +4,35 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 
-//* [TODO] Document the idea of front-end messages: 
-//          [TRY_MOVE]: calls move, [TRY_UPGRADE_PAWN]: calls moveAndUpgradePawn, [TRY_CASTLE]: calls castleKing
-// TODO: DELETE PREVIOUS STATUS HASH MAP WHENEVER THE FRONT-END MESSAGE IS [TRY_UPGRADE_PAWN] and the method return true. 
-
 public class Desk {
     private Board board;
-    private ArrayList<String[]> whitePlayerCaptures; 
-    private ArrayList<String[]> blackPlayerCaptures;
-    private ArrayList<String[]> historyArray;
     private HashMap<String, Integer> boardStatusCounter;
     // private Connections[];
     public Desk() {
         this.board = new Board();
-        this.whitePlayerCaptures = new ArrayList<String[]>();
-        this.blackPlayerCaptures = new ArrayList<String[]>();
-        this.historyArray = new ArrayList<String[]>();
         this.boardStatusCounter = new HashMap<String,Integer>();
     };
 
-    // public boolean move(int[] currentPos, int[] newPos, String pawnUpgrade){
-    //     boolean isLegalMove;
-
-    //     if (pawnUpgrade == "") {
-    //         isLegalMove = board.move(currentPos, newPos);
-    //         if (!isLegalMove) return false;
-    //         String statusKey = board.statusKey();
-    //         if (boardStatusCounter.containsKey(statusKey)){
-    //             boardStatusCounter.compute(statusKey, (k, v) -> v++);
-    //         }
-    //         else boardStatusCounter.put(statusKey, 1);
-    //     } else {
-    //         isLegalMove = board.moveAndUpgradePawn(currentPos, newPos, pawnUpgrade);
-    //         if (!isLegalMove) return false;
+    private boolean move(int[] currentPos, int[] newPos, String pawnUpgrade){
+        boolean isLegalMove;
+        
+        if (pawnUpgrade == "") {
+            isLegalMove = board.move(currentPos, newPos);
+            if (!isLegalMove) return false;
+            String statusKey = board.statusKey();
+            if (boardStatusCounter.containsKey(statusKey)){
+                boardStatusCounter.compute(statusKey, (k, v) -> v++);
+            }
+            else boardStatusCounter.put(statusKey, 1);
+        } else {
+            isLegalMove = board.moveAndUpgradePawn(currentPos, newPos, pawnUpgrade);
+            if (!isLegalMove) return false;
             
             
-    //     }
+        }
 
-    //     return true;
-    // }
+        return true;
+    }
 
 
 
