@@ -1,5 +1,6 @@
 package chess;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import chess.pieces.*;
 
@@ -293,6 +294,38 @@ public class Board {
     public boolean isKingCheckedById(int id) {
         return this.kingsAccess[id].getIsInCheck();
     }
+
+    public boolean arePiecesEnough(int id){
+        int kingIndex = id == 0 ? 12 : 28;
+        int horse1Index = id == 0 ? 9 : 25;
+        int horse2Index = id == 0 ? 14 : 30;
+        int bishop1Index = id == 0 ? 10 : 26;
+        int bishop2Index = id == 0 ? 13 : 29;
+        int oponentKing = id == 0 ? 28 : 12;
+
+        // King against King
+       Integer[] caseKings = {kingIndex, oponentKing}; 
+        
+        // King and Knight againts King
+        Integer[] caseKn1 = {kingIndex, horse1Index, oponentKing};
+        Integer[] caseKn2 = {kingIndex, horse2Index, oponentKing};
+
+
+        // King and Both Kinghts againts King
+        Integer[] caseBothKns = {kingIndex, horse1Index, horse2Index, oponentKing};
+        
+        // King and Bishop against King
+        Integer[] caseBi1 = {kingIndex, bishop1Index, oponentKing};
+        Integer[] caseBi2 = {kingIndex, bishop2Index, oponentKing};
+
+        Integer[][] allCases = {caseKings, caseKn1, caseKn2, caseBothKns, caseBi1, caseBi2,};
+
+        for (Integer[] caseIndex : allCases) {
+            ArrayList<Integer> exceptionIndexArr = new ArrayList<Integer>(Arrays.asList(caseIndex));
+            if (this.allPiecesOutOfRange(exceptionIndexArr)) return false;
+        }
+        return true;
+    }
     
     @Override
     public String toString() {
@@ -469,5 +502,14 @@ public class Board {
             r.setCanCastle(false);
         }
 
+    }
+
+
+    private boolean allPiecesOutOfRange(ArrayList<Integer> exceptionIndexes){
+        for (int i = 0; i < this.piecesArr.length; i++) {
+            if (exceptionIndexes.contains(i)) continue;
+            if (this.piecesArr[i].getPosition().isPointInRange(0, 8)) return false;
+        }
+        return true;
     }
 }

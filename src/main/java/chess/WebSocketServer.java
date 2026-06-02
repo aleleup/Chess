@@ -9,9 +9,9 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-//* [TODO] Document the idea of front-end messages: 
+// Front-end messages: 
 //          [MOVE]: calls move, [PAWN_UPGRADE]: calls moveAndUpgradePawn, [CASTLE]: calls castleKing
-// TODO: DELETE PREVIOUS STATUS HASH MAP WHENEVER THE FRONT-END MESSAGE IS [TRY_UPGRADE_PAWN] and the method return true. 
+// DELETE PREVIOUS STATUS HASH MAP WHENEVER THE FRONT-END MESSAGE IS [TRY_UPGRADE_PAWN] and the method return true. 
 
 
 
@@ -28,7 +28,10 @@ public class WebSocketServer {
         int playerId, String pawnUpgrade, double timeStamp
     ){};
 
-    private static record BrodcastMessage(boolean wasLegalMove, int playerTurn, GameOverData gameOverData){};
+    private static record BrodcastMessage(
+        boolean wasLegalMove, int playerTurn, GameOverData gameOverData,
+        int[] previousPos, int[] newPos, String pawnUpgrade
+    ){};
 
     private static record GameOverData(boolean isTie, int winnerId, String reasson){};
 
@@ -97,7 +100,11 @@ public class WebSocketServer {
         app.ws("/board", ws -> {
             ws.onConnect(context -> {
                 System.out.println("Client connected: " + context.sessionId());
-                if (board == null) board = new Board();
+                if (board == null) {
+                    board = new Board();
+                    boardStatusCounter = new HashMap<String, Integer>(); 
+                    System.out.println("New board created: \n" + board.toString());
+                }
                 keepConnectionAlive(context);
                 keep2Connections(context);
                 context.send("Amount of connections now: " + players.size());
@@ -108,10 +115,10 @@ public class WebSocketServer {
                 try {
                 
                     BodyMessage playerMessage = mapper.readValue(message, BodyMessage.class);
-                    System.out.println("player data " + playerMessage.typeOfMove() + playerMessage.playerId() + playerMessage.timeStamp); 
                     BrodcastMessage serverMessage = movesHandle(playerMessage);
                     String brodcastMessage = mapper.writeValueAsString(serverMessage);
                     brodcast(brodcastMessage);
+
                 } catch (Exception e) {
                     System.out.println("ERROR: " + e);
                 }
@@ -155,38 +162,31 @@ public class WebSocketServer {
 
     private static BrodcastMessage movesHandle(BodyMessage mssg) {
         boolean wasLegalMove = false;
-        int playerTurn = mssg.playerId;
         GameOverData gameOverData = null;
 
-        if (mssg.typeOfMove == "MOVE") {
+        if (mssg.typeOfMove().equals("MOVE")) {
             wasLegalMove = board.move(mssg.currentPos(), mssg.newPos());
-            if (wasLegalMove) {
-                updateBoardStatusCounter();
-                String boardKey = updateBoardStatusCounter();
-                gameOverData = checkIsGameOver(mssg.playerId(), mssg.timeStamp(), boardKey);
-                playerTurn = (mssg.playerId + 1) % 2;
-            } 
         }
-        if (mssg.typeOfMove == "CASTLE") {
+        else if (mssg.typeOfMove().equals("CASTLE")) {
             wasLegalMove = board.castleKing(mssg.currentPos(), mssg.newPos());
-            if (wasLegalMove) {
-                updateBoardStatusCounter();
-                String boardKey = updateBoardStatusCounter();
-                gameOverData = checkIsGameOver(mssg.playerId(), mssg.timeStamp(), boardKey);
-                playerTurn = (mssg.playerId + 1) % 2;
-            } 
         }
-        if (mssg.typeOfMove == "PAWN_UPGRADE") {
+        else if (mssg.typeOfMove().equals("PAWN_UPGRADE")) {
             wasLegalMove = board.moveAndUpgradePawn(mssg.currentPos(), mssg.newPos(), mssg.pawnUpgrade);
-            if (wasLegalMove) {
-                boardStatusCounter.clear();
-                String boardKey = updateBoardStatusCounter();
-                gameOverData = checkIsGameOver(mssg.playerId(), mssg.timeStamp(), boardKey);
-                playerTurn = (mssg.playerId + 1) % 2;
-            }
+            if (wasLegalMove) {boardStatusCounter.clear();}
         }
+
+
+        if (wasLegalMove) {
+            String boardKey = updateBoardStatusCounter();
+            gameOverData = checkIsGameOver(mssg.playerId(), mssg.timeStamp(), boardKey);
+            playerTurn = (mssg.playerId + 1) % 2;
+        } 
+
         System.out.println(board.toString());
-        return new BrodcastMessage(wasLegalMove, playerTurn, gameOverData);
+
+        return new BrodcastMessage(
+            wasLegalMove, playerTurn, gameOverData, mssg.currentPos(), mssg.newPos, mssg.pawnUpgrade
+        );
     }
 
     /**
@@ -209,9 +209,8 @@ public class WebSocketServer {
         int contrincantId = (playerId + 1) % 2;
         
         if (time <= 0) {
-            // if (board.hasMaterial(contrincantId)) return new GameOverData(false, playerId, "TIMEOUT");
-            // else return new GameOverData(true, -1, "TIMEOUT_WITHOUT_MATERIAL");
-            return new GameOverData(false, contrincantId, "TIMEOUT");
+            if (board.arePiecesEnough(contrincantId)) return new GameOverData(false, contrincantId, "TIMEOUT");
+            else return new GameOverData(true, -1, "TIMEOUT_WITHOUT_MATERIAL");
         }
         
         // There is no possible move for the contrincant and ...
@@ -227,8 +226,7 @@ public class WebSocketServer {
             return new GameOverData(true, -1, "REPETITION");
         }
 
-        //[TODO] LACK OF MATERIALS TIE.
-
+        if (!(board.arePiecesEnough(playerId) || board.arePiecesEnough(contrincantId))) return new GameOverData(true, -1, "LACK_MATERIALS");
         return null;
     }
 
