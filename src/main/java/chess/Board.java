@@ -13,7 +13,7 @@ public class Board {
     private ArrayList<String[]> whitePlayerCaptures; 
     private ArrayList<String[]> blackPlayerCaptures;
     private ArrayList<String[]> historyArray;
-
+    private int[][] casteledPiecePos;
     // val pieces -> {King, Queen, Rook, Knights, Bishops}
     public Board(){
         board = new Piece[8][8];
@@ -212,9 +212,17 @@ public class Board {
         
         rook.move(rookNewPos);
         rook.setCanCastle(false);
+
+        this.casteledPiecePos = new int[2][];
+        this.casteledPiecePos[0] = king.getPosition().getPos();
+        this.casteledPiecePos[1] = rook.getPosition().getPos();
         return true;
     }
 
+
+    public int[][] getCasteledPiecesPos(){
+        return this.casteledPiecePos;
+    }
     /**
      * @param id
      * @return if there is any legal move for the player {id}

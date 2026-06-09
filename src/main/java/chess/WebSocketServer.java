@@ -13,7 +13,8 @@ import java.util.concurrent.ConcurrentHashMap;
 //          [MOVE]: calls move, [PAWN_UPGRADE]: calls moveAndUpgradePawn, [CASTLE]: calls castleKing
 // DELETE PREVIOUS STATUS HASH MAP WHENEVER THE FRONT-END MESSAGE IS [TRY_UPGRADE_PAWN] and the method return true. 
 
-
+// [TODO]: REFACTOR SERVICE. Create Desk entity that handles the communication with the board. Interpretation of user messages and 
+// creation of server messages. (Research if it doesn't cause any concurrency issue)
 
 public class WebSocketServer {
     // Simple carrier of data
@@ -29,12 +30,15 @@ public class WebSocketServer {
     ){};
 
     private static record BrodcastMessage(
-        boolean wasLegalMove, int playerTurn, GameOverData gameOverData,
-        int[] previousPos, int[] newPos, String pawnUpgrade
+        boolean wasLegalMove, int playerTurn, GameOverData gameOverData, int[] previousPos,
+         int[] newPos, String pawnUpgrade, CastelingData castelingData, String prevTypeOfMove
     ){};
 
     private static record GameOverData(boolean isTie, int winnerId, String reasson){};
 
+    private static record ConnectionMessage(boolean success, int id, String message){};
+
+    private static record CastelingData(int[] kingPos, int[] rookPos){};
     public static void main(String[] args){
         ObjectMapper mapper = new ObjectMapper();
         Javalin app = Javalin.create().start(7070);
@@ -105,9 +109,16 @@ public class WebSocketServer {
                     boardStatusCounter = new HashMap<String, Integer>(); 
                     System.out.println("New board created: \n" + board.toString());
                 }
+                String successMesage = mapper.writeValueAsString(
+                    new ConnectionMessage(true, players.size(), "Connected")
+                );
+                String rejectedMesage = mapper.writeValueAsString(
+                    new ConnectionMessage(false, -1, "Board Full")
+                );
+
                 keepConnectionAlive(context);
-                keep2Connections(context);
-                context.send("Amount of connections now: " + players.size());
+                keep2Connections(context, successMesage, rejectedMesage);
+                
             });
             ws.onMessage(context -> {
                 String message = context.message();
@@ -145,12 +156,15 @@ public class WebSocketServer {
         ctx.enableAutomaticPings();
     }; 
 
-    private static void keep2Connections(WsContext ctx) {
+    private static void keep2Connections(WsContext ctx, String successMessage, String rejectedMesage) {
         if (players.size() > 1) {
-            ctx.send("To many Users"); ctx.closeSession();
+            ctx.send(rejectedMesage); 
+            ctx.closeSession();
         }
         else {
             players.add(ctx);
+            ctx.send(successMessage); 
+
         }
     }
 
@@ -163,12 +177,17 @@ public class WebSocketServer {
     private static BrodcastMessage movesHandle(BodyMessage mssg) {
         boolean wasLegalMove = false;
         GameOverData gameOverData = null;
-
+        CastelingData caselingData = null;
         if (mssg.typeOfMove().equals("MOVE")) {
             wasLegalMove = board.move(mssg.currentPos(), mssg.newPos());
         }
         else if (mssg.typeOfMove().equals("CASTLE")) {
             wasLegalMove = board.castleKing(mssg.currentPos(), mssg.newPos());
+            if (wasLegalMove) { 
+                int[][] kingAndRookPos = board.getCasteledPiecesPos();
+                caselingData = new CastelingData(kingAndRookPos[0], kingAndRookPos[1]);
+                
+            }
         }
         else if (mssg.typeOfMove().equals("PAWN_UPGRADE")) {
             wasLegalMove = board.moveAndUpgradePawn(mssg.currentPos(), mssg.newPos(), mssg.pawnUpgrade);
@@ -185,7 +204,7 @@ public class WebSocketServer {
         System.out.println(board.toString());
 
         return new BrodcastMessage(
-            wasLegalMove, playerTurn, gameOverData, mssg.currentPos(), mssg.newPos, mssg.pawnUpgrade
+            wasLegalMove, playerTurn, gameOverData, mssg.currentPos(), mssg.newPos, mssg.pawnUpgrade, caselingData, mssg.typeOfMove()
         );
     }
 
