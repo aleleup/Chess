@@ -190,7 +190,7 @@ public class WebSocketServer {
             }
         }
         else if (mssg.typeOfMove().equals("PAWN_UPGRADE")) {
-            wasLegalMove = board.moveAndUpgradePawn(mssg.currentPos(), mssg.newPos(), mssg.pawnUpgrade);
+            wasLegalMove = board.moveAndUpgradePawn(mssg.currentPos(), mssg.newPos(), mssg.pawnUpgrade());
             if (wasLegalMove) {boardStatusCounter.clear();}
         }
 

@@ -105,14 +105,14 @@ public class Board {
         
         if (!isLegalMove(pawn, board[newPos[0]][newPos[1]], newPos)) return false;
 
-        if (newPieceName == "Kn"){
+        if (newPieceName.equals("Kn")){
             pawnUpgraded = new Knight(pawnId, newPos);
         }
-        else if (newPieceName == "B"){
+        else if (newPieceName.equals("B")){
             pawnUpgraded = new Bishop(pawnId, newPos);
-        } else if (newPieceName == "R"){
+        } else if (newPieceName.equals("R")){
             pawnUpgraded = new Rook(pawnId, newPos);
-        } else if (newPieceName == "Q"){
+        } else if (newPieceName.equals("Q")){
             pawnUpgraded = new Queen(pawnId, newPos);
         } else { return false; }
 
