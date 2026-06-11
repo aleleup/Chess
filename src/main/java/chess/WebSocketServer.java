@@ -6,6 +6,7 @@ import io.javalin.websocket.WsContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Duration;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -19,10 +20,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class WebSocketServer {
     // Simple carrier of data
     //Map<String, Set<WsContext>> playGround -> future
-    private static final Set<WsContext> players = ConcurrentHashMap.newKeySet();
-    private static Board board;
+private static final Map<WsContext, Integer> players = new ConcurrentHashMap<>();    private static Board board;
     private static HashMap<String, Integer> boardStatusCounter;
-    private static int playerTurn = 0;
+    private static int playerTurn;
     /*RECORDS*/
     private record BodyMessage( 
         String typeOfMove, int[] currentPos, int[] newPos, 
@@ -42,71 +42,13 @@ public class WebSocketServer {
     public static void main(String[] args){
         ObjectMapper mapper = new ObjectMapper();
         Javalin app = Javalin.create().start(7070);
-        app.ws("/test", ws -> {
-            ws.onConnect(context -> {
-                System.out.println("Client connected: " + context.sessionId());
-                keepConnectionAlive(context);
-            });
-            ws.onMessage(context -> {
-                String message = context.message();
-                System.out.println("Client mesage: " + message);
-
-            });
-
-            ws.onClose(context -> {
-                System.out.println("Client has disconnected: " + context.sessionId());
-            });
-
-            ws.onError(context -> {
-                System.out.println("Client has disconnected with error: " + context.error());
-            });
-
-
-        });
-        
-        // app.ws("/test-structures", ws -> {
-            
-        //     ws.onConnect(context -> {
-        //         System.out.println("Client connected: " + context.sessionId());
-        //         keepConnectionAlive(context);
-        //         connections++;
-        //         context.send("Amount of connections now: " + connections);
-        //         keep2Connections(context, connections);
-        //     });
-        //     ws.onMessage(context -> {
-        //         String message = context.message();
-        //         System.out.println("Client mesage: " + message);
-        //         try {
-                
-        //             BodyMessage playerMessage = mapper.readValue(message, BodyMessage.class);
-        //             System.out.println("player data " + playerMessage.typeOfMove() + playerMessage.playerId() + playerMessage.timeStamp); 
-        //             BrodcastMessage serverMessage = new BrodcastMessage(true, 1, false, null);
-        //             String brodcastMessage = mapper.writeValueAsString(serverMessage);
-        //             brodcast(brodcastMessage);
-        //         } catch (Exception e) {
-        //             System.out.println("ERROR: " + e);
-        //         }
-
-        //     });
-
-        //     ws.onClose(context -> {
-        //         System.out.println("Client has disconnected: " + context.sessionId());
-        //         connections--;
-        //     });
-
-        //     ws.onError(context -> {
-        //         System.out.println("Client has disconnected with error: " + context.error());
-        //     });
-
-            
-        // });
-    
         app.ws("/board", ws -> {
             ws.onConnect(context -> {
                 System.out.println("Client connected: " + context.sessionId());
                 if (board == null) {
                     board = new Board();
                     boardStatusCounter = new HashMap<String, Integer>(); 
+                    playerTurn = 0;
                     System.out.println("New board created: \n" + board.toString());
                 }
                 String successMesage = mapper.writeValueAsString(
@@ -138,7 +80,24 @@ public class WebSocketServer {
 
             ws.onClose(context -> {
                 System.out.println("Client has disconnected: " + context.sessionId());
+                try {
+                    int winnerId = (players.get(context) + 1) % 2;
+                    GameOverData gameOverData = new GameOverData(false, winnerId, "ABANDON");
+                    BrodcastMessage abandonMessage = new BrodcastMessage(false, -1, gameOverData, null, null, null, null, null);
+                    String brodcastMessage = mapper.writeValueAsString(abandonMessage);
+                    brodcast(brodcastMessage);
+                    shutDown();
+                    board = null;
+                    boardStatusCounter = null;
+                    players.clear();
+                } catch (Exception e) {
+                    System.out.print("Error on closing sockets" + e);
+                }
+                
+
             });
+
+            
 
             ws.onError(context -> {
                 System.out.println("Client has disconnected with error: " + context.error());
@@ -162,15 +121,23 @@ public class WebSocketServer {
             ctx.closeSession();
         }
         else {
-            players.add(ctx);
+            Integer id = players.size();
+            players.put(ctx, id);
             ctx.send(successMessage); 
 
         }
     }
 
     private static void brodcast(String message) {
-        for (WsContext ctx : players){
+        for (WsContext ctx : players.keySet()){
             ctx.send(message);
+        }
+    }
+
+    private static void shutDown(){
+        // [TODO] brodcast Shut Down socket message
+        for (WsContext ctx : players.keySet()){
+            if (ctx.session.isOpen()) ctx.closeSession();
         }
     }
 

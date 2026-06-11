@@ -9,7 +9,8 @@ public class Board {
     private Piece[] piecesArr; // 0 -> 15 whites val pieces // 15 -> 31 blacks val pieces
     private King[] kingsAccess;
     private int[] outOfRangePos  = {8,8};
-    // [TODO]
+    // [TODO] CHECK KNIGHT RANGE OF MOVEMENT.
+    // [TODO] 
     private ArrayList<String[]> whitePlayerCaptures; 
     private ArrayList<String[]> blackPlayerCaptures;
     private ArrayList<String[]> historyArray;
