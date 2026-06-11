@@ -218,8 +218,13 @@ private static final Map<WsContext, Integer> players = new ConcurrentHashMap<>()
 
     private static String updateBoardStatusCounter() {
         String boardKey = board.statusKey();
-        boardStatusCounter.putIfAbsent(boardKey, 1);
-        boardStatusCounter.computeIfPresent(boardKey, (key, val) -> val++);
+        
+        Integer prevVal = boardStatusCounter.get(boardKey);
+        if (prevVal!=null) {boardStatusCounter.put(boardKey, prevVal + 1);
+        }       
+        else boardStatusCounter.put(boardKey, 1);
+
+        System.out.println("\n Key added: " + boardStatusCounter.toString());
         return boardKey;
     }
 
