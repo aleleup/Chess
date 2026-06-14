@@ -7,5 +7,4 @@ chess/pieces/Castler.class
 chess/Board.class
 chess/pieces/Rook.class
 chess/pieces/Bishop.class
-chess/Main.class
 chess/pieces/Pawn.class

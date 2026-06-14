@@ -2,6 +2,8 @@ package chess.pieces;
 
 import java.util.ArrayList;
 
+import chess.MatrixPoint;
+
 public class Knight extends Piece {
     public Knight(int teamId, int[] pos) {
         super(teamId, pos);
@@ -12,21 +14,21 @@ public class Knight extends Piece {
     @Override
     public ArrayList<int[]> rangeOfMovement() {
         ArrayList<int[]> res = new ArrayList<int[]>();
-        int i = 2;
-        while (i > -3){
-            if (i != 0){
-                int j = 1 + i % 2;
-                if (this.isCoordInRange(this.pos.getPos()[0] + i) && this.isCoordInRange(this.pos.getPos()[1] + j)) {
-                    int[] posInRange = {this.pos.getPos()[0] + i, this.pos.getPos()[1] + j};
-                    res.add(posInRange);
-                }
-                if (this.isCoordInRange(this.pos.getPos()[0] + i) && this.isCoordInRange(this.pos.getPos()[1] - j)) {
-                    int[] posInRange = {this.pos.getPos()[0] + i, this.pos.getPos()[1] - j};
-                    res.add(posInRange);
-                }
+
+        int[][] relativeJumps = {
+            {2,1}, {2, -1}, {1, 2}, {1, -2},
+            {-2,-1}, {-2, 1}, {-1, -2}, {-1, 2}
+
+        };
+
+
+        int[] knightPos = pos.getPos();
+            for (int[] relJump : relativeJumps){
+                MatrixPoint point = new MatrixPoint(relJump[0] + knightPos[0], relJump[1] + knightPos[1]);
+                if (!point.isPointInRange(0, 8)) continue;
+                res.add(point.getPos());
             }
-            i--;
-        }
+
         return res;
     }
 }

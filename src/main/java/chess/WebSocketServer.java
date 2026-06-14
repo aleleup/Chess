@@ -7,16 +7,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-// Front-end messages: 
-//          [MOVE]: calls move, [PAWN_UPGRADE]: calls moveAndUpgradePawn, [CASTLE]: calls castleKing
-// DELETE PREVIOUS STATUS HASH MAP WHENEVER THE FRONT-END MESSAGE IS [TRY_UPGRADE_PAWN] and the method return true. 
 
-// [TODO]: REFACTOR SERVICE. Create Desk entity that handles the communication with the board. Interpretation of user messages and 
-// creation of server messages. (Research if it doesn't cause any concurrency issue)
-
+// RUN PROJECT:  mvn exec:java
 public class WebSocketServer {
     // Simple carrier of data
     //Map<String, Set<WsContext>> playGround -> future
