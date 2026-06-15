@@ -129,7 +129,6 @@ private static final Map<WsContext, Integer> players = new ConcurrentHashMap<>()
     }
 
     private static void shutDown(){
-        // [TODO] brodcast Shut Down socket message
         for (WsContext ctx : players.keySet()){
             if (ctx.session.isOpen()) ctx.closeSession();
         }
@@ -139,6 +138,7 @@ private static final Map<WsContext, Integer> players = new ConcurrentHashMap<>()
         boolean wasLegalMove = false;
         GameOverData gameOverData = null;
         CastelingData caselingData = null;
+        String pawnUpgrade = "";
         if (mssg.typeOfMove().equals("MOVE")) {
             wasLegalMove = board.move(mssg.currentPos(), mssg.newPos());
         }
@@ -152,7 +152,10 @@ private static final Map<WsContext, Integer> players = new ConcurrentHashMap<>()
         }
         else if (mssg.typeOfMove().equals("PAWN_UPGRADE")) {
             wasLegalMove = board.moveAndUpgradePawn(mssg.currentPos(), mssg.newPos(), mssg.pawnUpgrade());
-            if (wasLegalMove) {boardStatusCounter.clear();}
+            if (wasLegalMove) {
+                pawnUpgrade = mssg.pawnUpgrade();
+                boardStatusCounter.clear();
+            }
         }
 
 
@@ -165,7 +168,7 @@ private static final Map<WsContext, Integer> players = new ConcurrentHashMap<>()
         System.out.println(board.toString());
 
         return new BrodcastMessage(
-            wasLegalMove, playerTurn, gameOverData, mssg.currentPos(), mssg.newPos, mssg.pawnUpgrade, caselingData, mssg.typeOfMove()
+            wasLegalMove, playerTurn, gameOverData, mssg.currentPos(), mssg.newPos, pawnUpgrade, caselingData, mssg.typeOfMove()
         );
     }
 
