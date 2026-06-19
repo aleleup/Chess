@@ -478,7 +478,9 @@ public class Board {
         Piece[] knightsArray = {this.piecesArr[kn1Index],this.piecesArr[k2Index]};
 
         for (Piece kn : knightsArray) {
-            if (this.isInRangeOfMovement(kn, k.getPosition().getPos())) {
+            if (
+                // kn.getPosition().isPointInRange(0, 8) && 
+                this.isInRangeOfMovement(kn, k.getPosition().getPos())) {
                 kingsAnnoyers.add(kn);
             }
         }

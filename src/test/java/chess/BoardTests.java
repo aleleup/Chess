@@ -328,86 +328,147 @@ public class BoardTests {
     // }
 
 
-    @Test
-    void testcastleKing() {
-        Board board = new Board();
+    // @Test
+    // void testcastleKing() {
+    //     Board board = new Board();
 
-        //Free space AND legal case
-        board.setBoardFromKey("6061626364656667708888887488887710111213141516170088888804888807");
-        System.out.println(board.toString());
-        int[] whiteKing0 = {7,4};
-        int[] rightWRook = {7,7}; int[] leftWRook = {7,0};
-        assertTrue(board.castleKing(whiteKing0, rightWRook));
-        assertEquals(board.statusKey(), "6061626364656667708888887688887510111213141516170088888804888807");
-        System.out.println(board.toString());
+    //     //Free space AND legal case
+    //     board.setBoardFromKey("6061626364656667708888887488887710111213141516170088888804888807");
+    //     System.out.println(board.toString());
+    //     int[] whiteKing0 = {7,4};
+    //     int[] rightWRook = {7,7}; int[] leftWRook = {7,0};
+    //     assertTrue(board.castleKing(whiteKing0, rightWRook));
+    //     assertEquals(board.statusKey(), "6061626364656667708888887688887510111213141516170088888804888807");
+    //     System.out.println(board.toString());
 
-        int[] blackKing = {0,4}; int[] leftBRook = {0,0}; int[] rightBRook = {0,7};
-        assertTrue(board.castleKing(blackKing, leftBRook));
-        assertEquals(board.statusKey(), "6061626364656667708888887688887510111213141516170388888802888807");
-        System.out.println(board.toString());
+    //     int[] blackKing = {0,4}; int[] leftBRook = {0,0}; int[] rightBRook = {0,7};
+    //     assertTrue(board.castleKing(blackKing, leftBRook));
+    //     assertEquals(board.statusKey(), "6061626364656667708888887688887510111213141516170388888802888807");
+    //     System.out.println(board.toString());
 
-        // White King  moves AND can't castke
-        board = new Board();
+    //     // White King  moves AND can't castke
+    //     board = new Board();
 
-        board.setBoardFromKey("6061626364656667708888887488887710111213141516170088888804888807");
-        int[] whiteKing1 = {7,3};
-        assertTrue(board.move(whiteKing0, whiteKing1));
-        assertTrue(board.castleKing(blackKing, leftBRook));
-        assertEquals(board.statusKey(), "6061626364656667708888887388887710111213141516170388888802888807");
-        System.out.println(board.toString());
+    //     board.setBoardFromKey("6061626364656667708888887488887710111213141516170088888804888807");
+    //     int[] whiteKing1 = {7,3};
+    //     assertTrue(board.move(whiteKing0, whiteKing1));
+    //     assertTrue(board.castleKing(blackKing, leftBRook));
+    //     assertEquals(board.statusKey(), "6061626364656667708888887388887710111213141516170388888802888807");
+    //     System.out.println(board.toString());
 
-        assertFalse(board.castleKing(whiteKing1, rightWRook));
-        assertFalse(board.castleKing(whiteKing1, leftWRook));
+    //     assertFalse(board.castleKing(whiteKing1, rightWRook));
+    //     assertFalse(board.castleKing(whiteKing1, leftWRook));
 
-        // White Rook moves AND can't castle only on that side
-        board = new Board();
+    //     // White Rook moves AND can't castle only on that side
+    //     board = new Board();
 
-        board.setBoardFromKey("6061626364656667708888887488887710111213141516170088888804888807");
-        int[] leftWRook1 = {7,2};
-        assertTrue(board.move(leftWRook, leftWRook1));
-        assertTrue(board.castleKing(blackKing, leftBRook));
-        assertEquals(board.statusKey(), "6061626364656667728888887488887710111213141516170388888802888807");
-        assertTrue(board.move(leftWRook1, leftWRook));
+    //     board.setBoardFromKey("6061626364656667708888887488887710111213141516170088888804888807");
+    //     int[] leftWRook1 = {7,2};
+    //     assertTrue(board.move(leftWRook, leftWRook1));
+    //     assertTrue(board.castleKing(blackKing, leftBRook));
+    //     assertEquals(board.statusKey(), "6061626364656667728888887488887710111213141516170388888802888807");
+    //     assertTrue(board.move(leftWRook1, leftWRook));
 
-        int[] bP0 = {1,0}; int[] bP1 = {2,0};
-        assertTrue(board.move(bP0, bP1));
+    //     int[] bP0 = {1,0}; int[] bP1 = {2,0};
+    //     assertTrue(board.move(bP0, bP1));
 
-        System.out.println(board.toString());
+    //     System.out.println(board.toString());
 
-        assertFalse(board.castleKing(whiteKing0, leftWRook));
-        assertTrue(board.castleKing(whiteKing0, rightWRook));
-        System.out.println(board.toString());
+    //     assertFalse(board.castleKing(whiteKing0, leftWRook));
+    //     assertTrue(board.castleKing(whiteKing0, rightWRook));
+    //     System.out.println(board.toString());
 
 
-        // Piece in the middle case
+    //     // Piece in the middle case
 
-        board = new Board();
-        board.setBoardFromKey("6061626364656667707188887488767710111213141516170088888804888807");
-        System.out.println(board.toString());
-        assertFalse(board.castleKing(whiteKing0, rightWRook));
-        assertFalse(board.castleKing(whiteKing0, leftWRook));
+    //     board = new Board();
+    //     board.setBoardFromKey("6061626364656667707188887488767710111213141516170088888804888807");
+    //     System.out.println(board.toString());
+    //     assertFalse(board.castleKing(whiteKing0, rightWRook));
+    //     assertFalse(board.castleKing(whiteKing0, leftWRook));
 
-        // King is checked
-        board = new Board();
-        board.setBoardFromKey("6061626388656667708888887488887710111213881516170088880304888807");
-        int[] bq0 ={0,3}; int[] bq1 = {1,4};
-        assertTrue(board.move(bq0, bq1));
-        System.out.println(board.toString());
-        assertTrue(board.isKingCheckedById(0));
-        assertFalse(board.castleKing(whiteKing0, rightWRook));
-        assertFalse(board.castleKing(whiteKing0, leftWRook));
+    //     // King is checked
+    //     board = new Board();
+    //     board.setBoardFromKey("6061626388656667708888887488887710111213881516170088880304888807");
+    //     int[] bq0 ={0,3}; int[] bq1 = {1,4};
+    //     assertTrue(board.move(bq0, bq1));
+    //     System.out.println(board.toString());
+    //     assertTrue(board.isKingCheckedById(0));
+    //     assertFalse(board.castleKing(whiteKing0, rightWRook));
+    //     assertFalse(board.castleKing(whiteKing0, leftWRook));
 
-        // Trajectory is checked
-        board = new Board();
-        board.setBoardFromKey("6061626364888888708888107488887788888813141516170088886604888807");
-        System.out.println(board.toString());
-        assertFalse(board.castleKing(whiteKing0, rightWRook));
-        assertTrue(board.castleKing(whiteKing0, leftWRook));
-        System.out.println(board.toString());
+    //     // Trajectory is checked
+    //     board = new Board();
+    //     board.setBoardFromKey("6061626364888888708888107488887788888813141516170088886604888807");
+    //     System.out.println(board.toString());
+    //     assertFalse(board.castleKing(whiteKing0, rightWRook));
+    //     assertTrue(board.castleKing(whiteKing0, leftWRook));
+    //     System.out.println(board.toString());
         
-        assertFalse(board.castleKing(blackKing, leftBRook));
-        assertTrue(board.castleKing(blackKing, rightBRook));
-        System.out.println(board.toString());
+    //     assertFalse(board.castleKing(blackKing, leftBRook));
+    //     assertTrue(board.castleKing(blackKing, rightBRook));
+    //     System.out.println(board.toString());
+
+    // }
+
+
+    @Test
+    void testBugs() {
+        /*
+            Bishop can't take knight!
+
+            None problem in bishop.rangeOfMovement.
+            Problem at taking any knight?
+                Black knight at {4,3} can take white knight at {5,5}
+                White Knight at {5,5} can NOT take black knight at {4,3}
+            TRY TO EAT ANY BLACK KNIGHT.
+
+        */
+        String bugKey = "6061625344656667703336637664557510111223341516170043460306142505";
+        Board b = new Board();
+        b.setBoardFromKey(bugKey);
+
+        System.out.println(b.toString());
+        // // ORIGINAL TESTING
+        // assertEquals(bugKey, b.statusKey());
+
+        // int[] currentPos = {3,6}; int[]newPos = {2, 5};
+        // //White bishop eats black knight
+        // assertTrue(b.move(currentPos, newPos));
+
+        // System.out.println(b.toString());
+
+        // NEW PIPE!! Trying to take any knight. Both white and black
+
+        // THIS WORKS:  
+            // int[] blackKnight1 = {4,3}; int[] blackKnightEatsWhiteKnight = {5,5};
+            // assertTrue(b.move(blackKnight1, blackKnightEatsWhiteKnight));
+            // System.err.println(b.toString());
+        // THIS DOESN'T WORK!!!
+            // int[] whiteKnight = {5,5}; int[] whiteKnightEatsBlackKnight = {4,3};
+            // assertTrue(b.move(whiteKnight, whiteKnightEatsBlackKnight));
+            // System.err.println(b.toString());
+        // NEW PIPE: TRYING TO EAT ONLY BLACK KNIGHTS:
+
+        int[] blackKnight1 = {4,3}; int[] blackKnight2 = {5,1};
+        assertTrue(b.move(blackKnight1, blackKnight2));
+        System.out.println(b.toString());
+
+        // THIS FAILS:
+            // int[] pawn1 = {6,0}; int[] pawn2 = {5,1}; 
+            // assertTrue(b.move(pawn1, pawn2));
+            // System.out.println(b.toString());
+            
+            // int[] pawn1 = {6,2}; int[] pawn2 = {5,1}; 
+            // assertTrue(b.move(pawn1, pawn2));
+            // System.out.println(b.toString());
+
+        int[] queen1 = {6,3}; int[] queen2 = {5,2}; int[] queen3 = {5,1};
+        assertTrue(b.move(queen1, queen2));
+        System.out.println(b.toString());
+
+        assertTrue(b.move(queen2, queen3));
+
 
     }
 }

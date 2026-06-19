@@ -4,6 +4,8 @@ import io.javalin.websocket.WsConnectContext;
 import io.javalin.websocket.WsContext;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
@@ -225,6 +227,25 @@ private static final Map<WsContext, Integer> players = new ConcurrentHashMap<>()
         return boardKey;
     }
 
+
+    // public static void main(String[] args){
+    //     Board b = new Board(); 
+    //     b.setBoardFromKey("6061625344656667703336637664557510111223341516170043460306142505");
+
+    //     int[] blackKnight1 = {4,3}; int[] blackKnight2 = {5,1};
+    //     System.out.println(b.move(blackKnight1, blackKnight2));
+    //     System.out.println(b.toString());
+    //     System.out.println(b.toString());
+
+    //     int[] queen1 = {6,3}; int[] queen2 = {5,2}; int[] queen3 = {5,1};
+    //     System.out.println(b.move(queen1, queen2));
+    //     System.out.println(b.toString());
+
+    //     System.out.println(b.move(queen2, queen3));
+
+    //     System.out.println(b.toString());
+
+    // }
 
     
 }
