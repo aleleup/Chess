@@ -479,7 +479,7 @@ public class Board {
 
         for (Piece kn : knightsArray) {
             if (
-                // kn.getPosition().isPointInRange(0, 8) && 
+                kn.getPosition().isPointInRange(0, 8) && 
                 this.isInRangeOfMovement(kn, k.getPosition().getPos())) {
                 kingsAnnoyers.add(kn);
             }
